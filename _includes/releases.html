@@ -1,0 +1,17 @@
+<!-- Releases Section -->
+<section id="{{ page.title }}" class="container content-section text-center">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2">
+
+        {{ page.content | markdownify }}
+
+        {% for release in site.data.releases %}
+          <h4>
+            <strong> <a href="{{ release.url }}">{{ release.name }}</a> </strong> <br>
+            <small> {{ release.description }} </small>
+          </h4>
+        {% endfor %}
+
+      </div>
+    </div>
+</section>

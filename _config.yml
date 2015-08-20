@@ -16,7 +16,7 @@ excerpt_separator: " \n\n"   # Workaround for http://blog.slaks.net/2013-08-09/j
 
 pages_list:
   About: 'about'
-  Blog: 'blog'
+  Releases: 'releases'
   Career: 'career'
   Contact: 'contact'
 
