@@ -8,8 +8,10 @@ tags: [ 'MBCircularProgressBar','iOS', 'CALayer','IBInspectable','IBDesignable' 
 
 {% highlight objc %}
 @import UIKit;
+
 IB_DESIGNABLE
 @interface MBCircularProgressBarView : UIView
+
 @property (nonatomic,assign) IBInspectable CGFloat value;
 @property (nonatomic,assign) IBInspectable CGFloat maxValue;
 @property (nonatomic,assign) IBInspectable CGFloat valueFontSize;
@@ -29,5 +31,6 @@ IB_DESIGNABLE
 
 //CGLineCap
 @property (nonatomic,assign) IBInspectable NSInteger emptyCapType;
+
 @end
 {% endhighlight %}
