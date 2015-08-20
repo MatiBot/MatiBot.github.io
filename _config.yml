@@ -42,21 +42,26 @@ reddit-share: True
 events:
   - image: "/img/career/myroll.png"
     date: "2013 - Today"
-    description: "Lead iOS Developer @ <a href=\"http://www.myroll.com/\" target=\"_blank\">MyRoll</a><br>
+    description: "Lead iOS Developer @ MyRoll<br>
     Worked on Gallery Doctor (<a href=\"https://itunes.apple.com/app/id926864471?mt=8\">iOS</a>/<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.doctor&hl=en\">Android</a>) and MyRoll (iOS,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.flayvr&hl=en\">Android</a>)"
+    url: "http://www.myroll.com"
   - image: "/img/career/drippler.png"
     date: "2011 - 2013"
-    description: "Lead iOS Developer @ <a href=\"http://www.drippler.com/\" target=\"_blank\">Drippler</a><br>
+    description: "Lead iOS Developer @ <br>
     Created Drippler's app for <a href=\"https://itunes.apple.com/us/app/drippler-tips-apps-updates/id619307903?mt=8\">iOS</a>"
+    url: "http://www.drippler.com"
   - image: "/img/career/bqr.png"
     date: "2007 - 2011"
-    description: "Senior Software Engineer @ <a href=\"http://www.bqr.com/\" target=\"_blank\">BQR</a>"
+    description: "Senior Software Engineer @ BQR"
+    url: "http://www.bqr.com"
   - image: "/img/career/bgu.png"
     date: "2007 - 2010"
-    description: "Bachelor studies @ <a href=\"http://www.cs.bgu.ac.il/\" target=\"_blank\">Ben Gurion University</a> in Computer Science"
+    description: "Bachelor studies @ Ben Gurion University in Computer Science"
+    url: "http://www.cs.bgu.ac.il"
   - image: "/img/career/idf.jpg"
     date: "2004 - 2007"
-    description: "Senior Software Engineer @ IDF"
+    description: "Senior Software Engineer @ Battle Lab / Israel Defense Forces"
+    url: "https://www.idfblog.com/blog/2012/01/05/virtual-reality-the-idf-ground-forces-battle-lab/"
 
 # First image of the Career timeline
 career-img: "/img/career/default.jpg"
