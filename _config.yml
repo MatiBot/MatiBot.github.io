@@ -1,0 +1,79 @@
+# Site settings
+
+url: "http://www.matibot.com"
+title: "{ Mati Bot }"
+description: "Website of Mati Bot"
+keywords: "mati, bot, ios, iphone, ipad, android, objective c, swift, myroll, flayvr, drippler"
+favicon: "/img/favicon.ico"
+black-favicon: "/img/black-lab-glass.ico"
+google-tracking-id: "UA-66557167-1"
+disqus-shortname: "matibot"
+excerpt_separator: " \n\n"   # Workaround for http://blog.slaks.net/2013-08-09/jekyll-tag-was-never-closed
+
+# Navigation bar links
+# Blog link in the blog and post pages will point to the blog.html#blog
+# In the default page it will point to the preview of the last post
+
+pages_list:
+  About: 'about'
+  Blog: 'blog'
+  Career: 'career'
+  Contact: 'contact'
+
+background-img: "/img/intro-bg.jpg"
+
+# About variables
+
+me-img: "/img/me.jpg"
+
+# Blog variables
+paginate: 15
+
+paginate_path: "blog/page:num"
+
+post-preview-words: 128
+
+fb-share: True
+twitter-share: True
+reddit-share: True
+
+# Career variables
+
+events:
+  - image: "/img/career/myroll.png"
+    date: "2013 - Today"
+    description: "Lead iOS Developer @ <a href=\"http://www.myroll.com/\" target=\"_blank\">MyRoll</a><br>
+    Worked on Gallery Doctor (<a href=\"https://itunes.apple.com/app/id926864471?mt=8\">iOS</a>/<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.doctor&hl=en\">Android</a>) and MyRoll (iOS,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.flayvr&hl=en\">Android</a>)"
+  - image: "/img/career/drippler.png"
+    date: "2011 - 2013"
+    description: "Lead iOS Developer @ <a href=\"http://www.drippler.com/\" target=\"_blank\">Drippler</a><br>
+    Created Drippler's app for <a href=\"https://itunes.apple.com/us/app/drippler-tips-apps-updates/id619307903?mt=8\">iOS</a>"
+  - image: "/img/career/bqr.png"
+    date: "2007 - 2011"
+    description: "Senior Software Engineer @ <a href=\"http://www.bqr.com/\" target=\"_blank\">BQR</a>"
+  - image: "/img/career/bgu.png"
+    date: "2007 - 2010"
+    description: "Bachelor studies @ <a href=\"http://www.cs.bgu.ac.il/\" target=\"_blank\">Ben Gurion University</a> in Computer Science"
+  - image: "/img/career/idf.jpg"
+    date: "2004 - 2007"
+    description: "Senior Software Engineer @ IDF"
+
+# First image of the Career timeline
+career-img: "/img/career/default.jpg"
+
+# Social networks variables (many more available: facebook, flickr, dribbble, pinterest, instagram, tumblr etc.)
+social:
+
+  - title: "github"
+    url: "https://github.com/matibot"
+  - title: "linkedin"
+    url: "http://www.linkedin.com/in/matibot"
+  - title: "twitter"
+    url: "https://twitter.com/b0tnik"
+  - title: "rss"
+    url: "/feed.xml"
+
+404-img: "/img/labtocat.png"
+
+# Exclusion list from the generated _site
+exclude: ["Rakefile", "LICENSE", "readme.markdown", "vendor"]
