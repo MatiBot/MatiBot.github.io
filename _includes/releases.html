@@ -6,11 +6,11 @@
         {{ page.content | markdownify }}
 
         {% for release in site.data.releases %}
-          <h4>
-            <strong> {{ release.platform }}</strong> <small> . {{ release.language }} . </small>
-            <strong> <a href="{{ release.url }}">{{ release.name }}</a> </strong><br>
-            <small> {{ release.description }} </small>
-          </h4>
+        <h4>
+          <strong> {{ release.platform }}</strong> <small> . {{ release.language }} . </small>
+          <strong> <a href="{{ release.url }}">{{ release.name }}</a> </strong>
+          <small><div style="color:white"> {{ release.description }} </div></small>
+        </h4>
         {% endfor %}
 
       </div>
