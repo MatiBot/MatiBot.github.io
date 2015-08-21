@@ -34,3 +34,8 @@ IB_DESIGNABLE
 
 @end
 {% endhighlight %}
+
+<!-- Place this tag where you want the button to render. -->
+<a class="github-button" href="https://github.com/matibot/MBCircularProgressBar" data-count-href="/matibot/MBCircularProgressBar/stargazers" data-count-api="/repos/matibot/MBCircularProgressBar#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star matibot/MBCircularProgressBar on GitHub">Star</a>
+<!-- Place this tag right after the last button or just before your close body tag. -->
+<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
