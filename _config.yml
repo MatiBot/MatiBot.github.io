@@ -43,7 +43,7 @@ events:
   - image: "/img/career/myroll.png"
     date: "2013 - Today"
     description: "Lead iOS Developer @ MyRoll<br>
-    Worked on Gallery Doctor (<a href=\"https://itunes.apple.com/app/id926864471?mt=8\">iOS</a>/<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.doctor&hl=en\">Android</a>) and MyRoll (iOS,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.flayvr&hl=en\">Android</a>)"
+    Worked on Gallery Doctor (<a href=\"https://itunes.apple.com/app/id926864471?mt=8\">iOS</a>,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.doctor&hl=en\">Android</a>) and MyRoll (<a href=\"javascript:AlertIt();\">iOS</a>,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.flayvr&hl=en\">Android</a>)"
     url: "http://www.myroll.com"
   - image: "/img/career/drippler.png"
     date: "2011 - 2013"
