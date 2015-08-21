@@ -7,7 +7,8 @@
 
         {% for release in site.data.releases %}
           <h4>
-            <strong> <a href="{{ release.url }}">{{ release.name }}</a> </strong> <br>
+            <strong> {{ release.platform }}</strong> <small> . {{ release.language }} . </small>
+            <strong> <a href="{{ release.url }}">{{ release.name }}</a> </strong><br>
             <small> {{ release.description }} </small>
           </h4>
         {% endfor %}

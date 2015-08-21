@@ -1,11 +1,17 @@
 - name: MBCircularProgressBar
-  description: a circular, animatable & highly customizable progress bar from the Interface Builder (Objective-C)
+  description: A circular, animatable & highly customizable progress bar from the Interface Builder
   url: https://github.com/matibot/MBCircularProgressBar
+  language: Objective C
+  platform: iOS
 
 - name: MBAssetsImporter
-  description: Import assets from Panoramio or from your OS X file system with their metadata to your iOS simulator (Swift)
+  description: Import assets from Panoramio or from your OS X file system with their metadata to your iOS simulator
   url: https://github.com/matibot/MBAssetsImporter
+  language: Swift
+  platform: iOS
 
 - name: MBStaticCollectionView
-  description: Make static UICollectionViewCells possible just like in UITableViewController, without the need to define a datasource! (Swift)
+  description: Make static UICollectionViewCells possible just like in UITableViewController, without the need to define a datasource!
   url: https://github.com/matibot/MBStaticCollectionView
+  language: Swift
+  platform: iOS
