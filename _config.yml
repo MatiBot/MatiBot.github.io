@@ -42,7 +42,7 @@ reddit-share: True
 events:
   - image: "/img/career/myroll.png"
     date: "2016 - Today"
-    description: "Lead iOS Developer @ Punch Group
+    description: "Lead iOS Developer @ Punch Group"
     url: "http://www.punch-agency.com"
   - image: "/img/career/myroll.png"
     date: "2013 - 2016"
