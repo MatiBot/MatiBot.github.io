@@ -40,7 +40,7 @@ reddit-share: True
 # Career variables
 
 events:
-  - image: "/img/career/punch.png"
+  - image: "/img/career/punch.jpg"
     date: "2016 - Today"
     description: "Lead iOS Developer @ Punch Group"
     url: "http://www.punch-agency.com"
