@@ -42,7 +42,7 @@ reddit-share: True
 events:
   - image: "/img/career/punch.png"
     date: "2016 - Today"
-    description: "Lead iOS & Android Engineer @ Punch Group (Working on several projects including <a href=\"http://www.theleague.com/\">The League</a> dating app. Working with iOS, Android, Node.js, Elasticsearch and Redis)"
+    description: "Lead iOS & Android Engineer @ Punch Group (Working on several projects including <a href=\"http://www.theleague.com/\">The League</a> dating app.\niOS, Android, Node.js, Elasticsearch and Redis)"
     url: "http://www.punch-agency.com"
   - image: "/img/career/myroll.png"
     date: "2013 - 2016"
