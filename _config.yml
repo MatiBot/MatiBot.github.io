@@ -42,7 +42,7 @@ reddit-share: True
 events:
   - image: "/img/career/league.png"
     date: "2016 - Today"
-    description: "Lead iOS & Android Engineer @ <a href=\"http://www.theleague.com/\">The League</a> dating app.\niOS, Android, Node.js, Elasticsearch and Redis)"
+    description: "Lead iOS & Android Engineer @ <a href=\"http://www.theleague.com/\">The League</a> dating app."
     url: "http://www.theleague.com"
   - image: "/img/career/myroll.png"
     date: "2013 - 2016"
