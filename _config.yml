@@ -40,7 +40,7 @@ reddit-share: True
 # Career variables
 
 events:
-  - image: "/img/career/punch.png"
+  - image: "/img/career/league.png"
     date: "2016 - Today"
     description: "Lead iOS & Android Engineer @ <a href=\"http://www.theleague.com/\">The League</a> dating app.\niOS, Android, Node.js, Elasticsearch and Redis)"
     url: "http://www.theleague.com"
