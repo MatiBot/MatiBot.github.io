@@ -40,7 +40,7 @@ reddit-share: True
 # Career variables
 
 events:
-  - image: "/img/career/league.png"
+  - image: "/img/career/airbnb.jpg"
     date: "2017 - Today"
     description: "Software Engineer @ <a href=\"http://www.airbnb.com/\">Airbnb</a>."
     url: "http://www.airbnb.com"
