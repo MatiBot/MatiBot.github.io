@@ -42,7 +42,7 @@ reddit-share: True
 events:
   - image: "/img/career/future.png"
     date: "Future"
-    description: "Have an interesting project to work on? Contact me <a href=\"mailto:matibot@gmail.com\">here</a> "
+    description: "Have an interesting project to work on? Contact me <a href=\"mailto:hi@mati.bot\">here</a> "
     url: "mailto:hi@mati.bot"
   - image: "/img/career/airbnb.jpg"
     date: "2017 - Today"
