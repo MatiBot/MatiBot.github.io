@@ -43,7 +43,7 @@ events:
   - image: "/img/career/future.png"
     date: "Future"
     description: "Have an interesting project to work on? Contact me <a href=\"mailto:matibot@gmail.com\">here</a> "
-    url: "mailto:matibot@gmail.com"
+    url: "mailto:hi@mati.bot"
   - image: "/img/career/airbnb.jpg"
     date: "2017 - Today"
     description: "Software Engineer @ <a href=\"http://www.airbnb.com/\">Airbnb</a>."
