@@ -394,3 +394,15 @@ img::-moz-selection {
 body {
     webkit-tap-highlight-color: rgba(255,255,255,.2);
 }
+
+/* Text alignment utilities */
+.text-left {
+    text-align: left;
+}
+
+/* Share button styles */
+.share-button-wrapper {
+    float: left;
+    padding: 0 5px;
+    vertical-align: top;
+}
