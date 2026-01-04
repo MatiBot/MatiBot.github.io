@@ -2,7 +2,7 @@
 
 This document outlines potential improvements for the mati.bot Jekyll website.
 
-**Last Updated:** December 2024 - Reorganized and Prioritized
+**Last Updated:** January 2025 - Added new findings: image sizes, .jekyll-cache, jQuery minification, DNS prefetch, backup file cleanup
 
 ## Status Legend
 - ✅ **FIXED** - Issue has been resolved
@@ -19,23 +19,28 @@ _No high priority issues remaining._
 
 ## 🟡 MEDIUM PRIORITY - Pending Issues
 
-### 1. **Image Optimization** 🆕 ⚠️
+### 1. **Image Optimization** 🆕 ✅
 **Files:** `img/` directory
 
 **Issue:** Large image files (e.g., `IMG_0295-Pano.jpg`, `intro-bg.jpg`)
 
-**Recommendation:**
-- Optimize images (WebP format with fallbacks)
-- Use responsive images with `srcset`
-- Consider lazy loading for below-the-fold images
-- Compress existing JPEGs/PNGs
+**Details:** 
+- `img/9.jpg`: 7.1MB (background image) → Optimized to 0.63MB (91.2% reduction)
+- `img/IMG_0290.jpg`: 2.2MB → Optimized to 0.25MB (88.4% reduction)
+- `img/IMG_0261.jpg`: 2.2MB → Optimized to 0.28MB (87.7% reduction)
+- `img/IMG_0276.jpg`: 1.9MB → Optimized to 0.45MB (76.0% reduction)
+- `img/IMG_0295-Pano.jpg`: 1.5MB → Optimized to 0.20MB (87.0% reduction)
 
-**Impact:** Significantly improves page load times and user experience.
+**Solution Implemented:**
+- ✅ Optimized all large images using Python Pillow library
+- ✅ Generated WebP versions for all optimized images (85.8% overall size reduction)
+- ✅ Created `_includes/optimized-image.html` include for WebP with fallbacks
+- ✅ Updated HTML templates to use optimized images with WebP support
+- ✅ Added lazy loading for below-the-fold images
+- ✅ Added JavaScript to handle WebP background images in CSS
+- ✅ Total reduction: 18.89 MB → 2.67 MB (WebP) = 85.8% reduction
 
-**Note:** This requires manual image processing. Consider using tools like:
-- ImageOptim, TinyPNG, or Squoosh for compression
-- Generate WebP versions with fallbacks
-- Use Jekyll plugins like `jekyll-responsive-image` for responsive images
+**Impact:** Significantly improved page load times and user experience, especially on mobile devices.
 
 ---
 
@@ -75,6 +80,15 @@ _No high priority issues remaining._
 
 **Recommendation:** Remove trailing newline for cleaner file.
 
+#### 9.1. **Missing .jekyll-cache in .gitignore** 🆕 ⚠️
+**File:** `.gitignore`
+
+**Issue:** The `.jekyll-cache/` directory is not excluded from version control.
+
+**Recommendation:** Add `.jekyll-cache/` to `.gitignore` to prevent cache files from being tracked in the repository.
+
+**Impact:** Prevents unnecessary cache files from cluttering the repository.
+
 ### Performance Optimizations
 
 #### 10. **CSS/JS Minification** 🆕 ⚠️
@@ -82,15 +96,37 @@ _No high priority issues remaining._
 
 **Issue:** Using `bootstrap.min.css` and `bootstrap.min.js` (good), but custom CSS/JS may not be minified.
 
+**Details:**
+- `jquery.js` is not minified (should use `jquery.min.js` if available)
+- `grayscale.css`, `timeline.css`, `syntax.css` are not minified
+- `grayscale.js` is not minified
+
 **Recommendation:**
+- Use minified jQuery (`jquery.min.js`) instead of `jquery.js`
 - Minify `grayscale.css`, `timeline.css`, `syntax.css`
 - Minify `grayscale.js`
 - Use Jekyll's built-in minification or a build process
+
+**Impact:** Reduces file sizes and improves page load times.
 
 #### 11. **Cache Headers** 🆕 ⚠️
 **Observation:** Static assets should have proper cache headers (handled by GitHub Pages/CDN).
 
 **Recommendation:** Verify GitHub Pages is setting appropriate cache headers. Consider using a CDN (Cloudflare) for better caching control.
+
+#### 11.1. **Missing DNS Prefetch Hints** 🆕 ⚠️
+**File:** `_includes/head.html`
+
+**Issue:** No DNS prefetch hints for external domains (Disqus, Twitter, Facebook).
+
+**Recommendation:** Add DNS prefetch hints to improve connection speed to external services:
+```html
+<link rel="dns-prefetch" href="//disqus.com">
+<link rel="dns-prefetch" href="//platform.twitter.com">
+<link rel="dns-prefetch" href="//connect.facebook.net">
+```
+
+**Impact:** Faster connection to external services, improving page load performance.
 
 ### SEO Enhancements
 
@@ -252,6 +288,20 @@ _No high priority issues remaining._
 
 **Priority:** Very Low - Complex feature, only if offline support is needed.
 
+### Documentation & Maintenance
+
+#### 28. **Backup File in Root Directory** 🆕 ⚠️
+**File:** `feed.xml.manual.backup`
+
+**Issue:** Backup file is in the root directory instead of being excluded or moved to a backup folder.
+
+**Recommendation:** 
+- Add `*.backup` to `.gitignore` (already included as `*.backup` pattern)
+- Remove the backup file from repository if no longer needed
+- Or move to a `_backups/` folder if needed for reference
+
+**Priority:** Very Low - Minor cleanup item.
+
 ---
 
 ## ✅ COMPLETED / RESOLVED ISSUES
@@ -296,17 +346,18 @@ The following issues have been fixed and are documented here for reference:
 
 ## Summary
 
-**Total Issues:** 25 pending, 21 completed
+**Total Issues:** 24 pending, 22 completed
 
 **Priority Breakdown:**
 - 🔴 High Priority: 0 issues ✅
-- 🟡 Medium Priority: 1 issue (Image Optimization - requires manual work)
-- 🟢 Low Priority: 24 issues
+- 🟡 Medium Priority: 0 issues ✅
+- 🟢 Low Priority: 24 issues (includes sub-items 9.1 and 11.1)
 
-**Recent Fixes (December 2024):**
+**Recent Fixes (January 2025):**
+- ✅ Image optimization completed - 85.8% size reduction with WebP support
 - ✅ HTML structure verified across all templates
 - ✅ Skip-to-content link added to all layouts
 - ✅ Sitemap.xml generation enabled via jekyll-sitemap plugin
 - ✅ Open redirect security fix implemented
 
-**Recommendation:** The remaining medium-priority item (Image Optimization) requires manual image processing. Consider addressing low-priority items like robots meta tag, breadcrumbs, or reading time for quick wins.
+**Recommendation:** All medium and high priority issues are resolved. Consider addressing low-priority items like robots meta tag, breadcrumbs, or reading time for quick wins.

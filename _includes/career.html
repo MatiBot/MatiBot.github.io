@@ -17,7 +17,7 @@
 
               <li class="{{ class }}">
                   <div class="timeline-image">
-                      <a href="{{ event.url }}"><img class="img-circle img-responsive" src="{{ event.image }}" alt="{{ event.date }} - {{ event.description | strip_html | truncatewords: 5 }}"></a>
+                      <a href="{{ event.url }}">{% include optimized-image.html src=event.image alt=event.date class="img-circle img-responsive" lazy=true %}</a>
                   </div>
                   <div class="timeline-panel">
                       <div class="timeline-heading">
@@ -32,7 +32,7 @@
 
             <li class="timeline-inverted">
               <div class="timeline-image">
-                <a href="https://en.wikipedia.org/wiki/Pneumodesmus"><img class="img-circle img-responsive" src="{{ site.career-img }}" alt="Career timeline start"></a>
+                <a href="https://en.wikipedia.org/wiki/Pneumodesmus">{% include optimized-image.html src=site.career-img alt="Career timeline start" class="img-circle img-responsive" lazy=true %}</a>
               </div>
             </li>
 

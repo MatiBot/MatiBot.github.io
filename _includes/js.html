@@ -19,6 +19,50 @@
 <!-- Custom Theme JavaScript -->
 <script src="{{ site.baseurl }}/js/grayscale.js" defer></script>
 
+<!-- WebP Background Image Support -->
+<script>
+(function() {
+  // Detect WebP support
+  function supportsWebP() {
+    var canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+  }
+  
+  // Update background images to WebP if supported
+  if (supportsWebP()) {
+    var styleSheets = document.styleSheets;
+    for (var i = 0; i < styleSheets.length; i++) {
+      try {
+        var rules = styleSheets[i].cssRules || styleSheets[i].rules;
+        for (var j = 0; j < rules.length; j++) {
+          var rule = rules[j];
+          if (rule.style && rule.style.backgroundImage) {
+            var bgImage = rule.style.backgroundImage;
+            // Replace .jpg and .png with .webp in background images
+            if (bgImage.indexOf('.jpg') !== -1 || bgImage.indexOf('.png') !== -1) {
+              rule.style.backgroundImage = bgImage.replace(/\.(jpg|png)/g, '.webp');
+            }
+          }
+        }
+      } catch (e) {
+        // Cross-origin stylesheets may throw errors, skip them
+      }
+    }
+    
+    // Also update inline styles and elements with background-image
+    var elements = document.querySelectorAll('[style*="background"]');
+    elements.forEach(function(el) {
+      var style = el.getAttribute('style');
+      if (style && (style.indexOf('.jpg') !== -1 || style.indexOf('.png') !== -1)) {
+        el.setAttribute('style', style.replace(/\.(jpg|png)/g, '.webp'));
+      }
+    });
+  }
+})();
+</script>
+
 {% if site.google-tracking-id %}
   <!-- Google tag (gtag.js) - Google Analytics 4 -->
   <!-- Note: SRI not practical for GA scripts as they change frequently -->

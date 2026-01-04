@@ -1,0 +1,22 @@
+{% comment %}
+Optimized image include with WebP support and lazy loading
+Usage: {% include optimized-image.html src="/img/image.jpg" alt="Description" class="optional-class" lazy=true %}
+{% endcomment %}
+{% assign image_src = include.src | default: '' %}
+{% assign webp_src = image_src | replace: '.jpg', '.webp' | replace: '.png', '.webp' %}
+{% assign lazy = include.lazy | default: false %}
+{% assign class = include.class | default: '' %}
+{% assign alt = include.alt | default: '' %}
+
+<picture>
+  <source srcset="{{ webp_src }}" type="image/webp">
+  <img 
+    src="{{ image_src }}" 
+    alt="{{ alt }}"
+    {% if class != '' %}class="{{ class }}"{% endif %}
+    {% if lazy %}loading="lazy"{% endif %}
+    {% if include.width %}width="{{ include.width }}"{% endif %}
+    {% if include.height %}height="{{ include.height }}"{% endif %}
+  >
+</picture>
+
