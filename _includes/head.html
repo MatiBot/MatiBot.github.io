@@ -4,9 +4,8 @@
     <meta name="description" content="{{ site.description }}" />
     <meta name="author" content="{{ site.author }}" />
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
-    {% if page.url == "/404.html" %}
-      <meta http-equiv="refresh" content="20; url=/">
-    {% endif %}
+    <meta name="theme-color" content="#000000">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>{{ site.title }} {% if page.title %} | {{ page.title }}{% endif %}</title>
 
     <!-- Open Graph / Facebook -->
@@ -40,7 +39,7 @@
     <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ site.favicon }}">
+    <link rel="icon" type="image/x-icon" href="{{ site.favicon }}">
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">

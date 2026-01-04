@@ -26,6 +26,15 @@
   {% include footer.html %}
 
   {% include js.html %}
+  
+  {% if page.url == "/404.html" %}
+  <script>
+    // Redirect to homepage after 20 seconds
+    setTimeout(function() {
+      window.location.href = '/';
+    }, 20000);
+  </script>
+  {% endif %}
     
   </body>
 </html>
