@@ -24,22 +24,22 @@
     <meta name="twitter:image" content="{% if page.image %}{{ page.image | prepend: site.url }}{% else %}{{ site.me-img | prepend: site.url }}{% endif %}">
 
     <!-- Bootstrap Core CSS -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ site.baseurl }}/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="/css/grayscale.css" rel="stylesheet">
-    <link href="/css/timeline.css" rel="stylesheet">
+    <link href="{{ site.baseurl }}/css/grayscale.css" rel="stylesheet">
+    <link href="{{ site.baseurl }}/css/timeline.css" rel="stylesheet">
 
     <!-- Syntax Highligher -->
-    <link href="/css/syntax.css" rel="stylesheet">
+    <link href="{{ site.baseurl }}/css/syntax.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="{{ site.baseurl }}/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
-    <link rel="icon" type="image/x-icon" href="{{ site.favicon }}">
+    <link rel="icon" type="image/x-icon" href="{{ site.baseurl }}{{ site.favicon }}">
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
