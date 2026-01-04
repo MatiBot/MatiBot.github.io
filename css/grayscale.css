@@ -1,7 +1,3 @@
----
----
-/* YAML block in order to get processed by Jekyll */
-
 /*!
  * Start Bootstrap - Grayscale Bootstrap Theme (http://startbootstrap.com)
  * Code licensed under the Apache License v2.0.
@@ -144,7 +140,7 @@ a:focus {
     padding: 100px 0;
     text-align: center;
     color: #fff;
-    background: url( {{ site.background-img }} ) no-repeat bottom center scroll;
+    background: url(/img/9.jpg) no-repeat bottom center scroll;
     background-color: #000;
     -webkit-background-size: cover;
     -moz-background-size: cover;

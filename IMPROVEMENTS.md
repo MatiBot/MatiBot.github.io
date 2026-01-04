@@ -29,17 +29,16 @@ _No high priority issues remaining._
 **Implementation:**
 - ✅ Downloaded minified jQuery 3.7.1 (jquery.min.js)
 - ✅ Created npm build process with terser (JS) and clean-css-cli (CSS)
+- ✅ Hardcoded background image path in `grayscale.css` (removed Jekyll Liquid syntax)
+- ✅ Minified `grayscale.css` → `grayscale.min.css` (8.0K → 5.9K, 26% reduction)
 - ✅ Minified `grayscale.js` → `grayscale.min.js` (5.2K → 2.2K, 58% reduction)
 - ✅ Minified `timeline.css` → `timeline.min.css` (4.3K → 3.0K, 30% reduction)
 - ✅ Minified `syntax.css` → `syntax.min.css` (3.9K → 2.0K, 49% reduction)
-- ⚠️ `grayscale.css` kept unminified - contains Jekyll Liquid syntax (`{{ site.background-img }}`) that requires Jekyll processing
-- ✅ Updated HTML templates to use minified versions where applicable
+- ✅ Updated HTML templates to use minified versions
 
 **Build Process:** Run `npm run minify` to regenerate minified files after changes.
 
-**Note:** `grayscale.css` cannot be pre-minified as it contains Jekyll Liquid variables that must be processed by Jekyll at build time.
-
-**Impact:** Reduced CSS/JS file sizes by ~30-58% for files that can be minified, improving page load times.
+**Impact:** Reduced CSS/JS file sizes by ~26-58%, saving ~14KB total and improving page load times.
 
 #### 2. **Cache Headers** ⚠️
 **Observation:** Static assets should have proper cache headers (handled by GitHub Pages/CDN).
@@ -241,7 +240,7 @@ The following issues have been fixed and are documented here for reference:
 - ✅ **.jekyll-cache in .gitignore** - Added `.jekyll-cache/` to `.gitignore` to prevent cache files from being tracked
 
 ### Performance
-- ✅ **CSS/JS Minification** - Minified custom CSS/JS files using npm build process (terser + clean-css-cli), reducing file sizes by 30-58% (note: grayscale.css kept unminified due to Jekyll Liquid syntax)
+- ✅ **CSS/JS Minification** - Minified all custom CSS/JS files using npm build process (terser + clean-css-cli), reducing file sizes by 26-58% and saving ~14KB total
 - ✅ **Image Optimization** - Optimized all large images (18.89 MB → 2.67 MB WebP = 85.8% reduction)
   - Generated WebP versions for all optimized images
   - Created `_includes/optimized-image.html` include for WebP with fallbacks
