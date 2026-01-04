@@ -1,12 +1,14 @@
 # Site settings
 
-url: "http://mati.bot"
+url: "https://mati.bot"
 title: "mati.bot"
 description: "Website of Mati Bot"
 keywords: "mati, bot, ios, iphone, airbnb, ipad, android, objective c, swift, myroll, flayvr, drippler, punch, league"
 favicon: "/img/favicon.ico"
 black-favicon: "/img/black-lab-glass.ico"
-google-tracking-id: "UA-66557167-1"
+# Google Analytics 4 Measurement ID
+# NOTE: UA-66557167-1 (Universal Analytics) was deprecated in July 2023
+google-tracking-id: "G-DZTJ36HLWQ"
 disqus-shortname: "matibot"
 excerpt_separator: " \n\n"   # Workaround for http://blog.slaks.net/2013-08-09/jekyll-tag-was-never-closed
 
@@ -45,34 +47,34 @@ events:
     url: "mailto:hi@mati.bot"
   - image: "/img/career/airbnb.jpg"
     date: "2017 - Today"
-    description: "Software Engineer @ <a href=\"http://www.airbnb.com/\">Airbnb</a>."
-    url: "http://www.airbnb.com"
+    description: "Software Engineer @ <a href=\"https://www.airbnb.com/\">Airbnb</a>."
+    url: "https://www.airbnb.com"
   - image: "/img/career/ebay.png"
     date: "2017 - 2017"
-    description: "Mobile Application Architect @ <a href=\"http://www.close5.com/\">eBay</a>."
-    url: "http://www.ebay.com/"
+    description: "Mobile Application Architect @ <a href=\"https://www.close5.com/\">eBay</a>."
+    url: "https://www.ebay.com/"
   - image: "/img/career/league.png"
     date: "2016 - 2017"
-    description: "Lead iOS & Android Engineer @ <a href=\"http://www.theleague.com/\">The League</a> dating app."
-    url: "http://www.theleague.com"
+    description: "Lead iOS & Android Engineer @ <a href=\"https://www.theleague.com/\">The League</a> dating app."
+    url: "https://www.theleague.com"
   - image: "/img/career/myroll.png"
     date: "2013 - 2016"
     description: "Lead iOS Engineer @ MyRoll (Acquired by <a href=\"https://www.avg.com\">AVG Technologies</a>)<br>
     Worked on Gallery Doctor (<a href=\"https://itunes.apple.com/app/id926864471?mt=8\">iOS</a>,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.doctor&hl=en\">Android</a>) and MyRoll (<a href=\"javascript:AlertIt();\">iOS</a>,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.flayvr&hl=en\">Android</a>)"
-    url: "http://www.myroll.com"
+    url: "https://www.myroll.com"
   - image: "/img/career/drippler.png"
     date: "2011 - 2013"
     description: "Lead iOS Engineer @ Drippler<br>
     Created Drippler's app for <a href=\"https://itunes.apple.com/us/app/drippler-tips-apps-updates/id619307903?mt=8\">iOS</a>"
-    url: "http://www.drippler.com"
+    url: "https://www.drippler.com"
   - image: "/img/career/bqr.png"
     date: "2007 - 2011"
     description: "Senior Software Engineer @ BQR"
-    url: "http://www.bqr.com"
+    url: "https://www.bqr.com"
   - image: "/img/career/bgu.png"
     date: "2007 - 2010"
     description: "Bachelor studies @ Ben Gurion University in Computer Science"
-    url: "http://www.cs.bgu.ac.il"
+    url: "https://www.cs.bgu.ac.il"
   - image: "/img/career/idf.jpg"
     date: "2004 - 2007"
     description: "Senior Software Engineer @ Battle Lab / Israel Defense Forces"
@@ -87,13 +89,18 @@ social:
   - title: "github"
     url: "https://github.com/matibot"
   - title: "linkedin"
-    url: "http://www.linkedin.com/in/matibot"
+    url: "https://www.linkedin.com/in/matibot"
   - title: "twitter"
     url: "https://twitter.com/b0tnik"
   - title: "rss"
     url: "/feed.xml"
 
 404-img: "/img/labtocat.png"
+
+# Plugins
+plugins:
+  - jekyll-paginate
+  - jekyll-feed
 
 # Exclusion list from the generated _site
 exclude: ["Rakefile", "LICENSE", "readme.markdown", "vendor"]

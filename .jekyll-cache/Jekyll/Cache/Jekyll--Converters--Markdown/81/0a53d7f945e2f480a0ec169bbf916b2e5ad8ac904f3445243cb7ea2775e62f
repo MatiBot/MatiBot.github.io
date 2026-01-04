@@ -1,0 +1,32 @@
+I"å<figure class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="k">@import</span> <span class="n">UIKit</span><span class="p">;</span>
+
+<span class="n">IB_DESIGNABLE</span>
+<span class="k">@interface</span> <span class="nc">MBCircularProgressBarView</span> <span class="p">:</span> <span class="nc">UIView</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">value</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">maxValue</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">valueFontSize</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">unitFontSize</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">copy</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">NSString</span><span class="o">*</span> <span class="n">unitString</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">strong</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">UIColor</span><span class="o">*</span> <span class="n">fontColor</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">progressRotationAngle</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">progressAngle</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">progressLineWidth</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">strong</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">UIColor</span><span class="o">*</span> <span class="n">progressColor</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">strong</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">UIColor</span><span class="o">*</span> <span class="n">progressStrokeColor</span><span class="p">;</span>
+
+<span class="c1">//CGLineCap</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">NSInteger</span> <span class="n">progressCapType</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">CGFloat</span> <span class="n">emptyLineWidth</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">strong</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">UIColor</span><span class="o">*</span> <span class="n">emptyLineColor</span><span class="p">;</span>
+
+<span class="c1">//CGLineCap</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span><span class="n">assign</span><span class="p">)</span> <span class="n">IBInspectable</span> <span class="n">NSInteger</span> <span class="n">emptyCapType</span><span class="p">;</span>
+
+<span class="k">@end</span></code></pre></figure>
+
+<!-- Place this tag where you want the button to render. -->
+<p><a class="github-button" href="https://github.com/matibot/MBCircularProgressBar" data-count-href="/matibot/MBCircularProgressBar/stargazers" data-count-api="/repos/matibot/MBCircularProgressBar#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star matibot/MBCircularProgressBar on GitHub">Star</a>
+<!-- Place this tag right after the last button or just before your close body tag. -->
+<script async="" defer="" id="github-bjs" src="https://buttons.github.io/buttons.js"></script></p>
+:ET
