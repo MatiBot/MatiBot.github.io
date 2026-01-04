@@ -1,43 +1,110 @@
 <!-- Career Section -->
-<section id="{{ page.title }}" class="container content-section text-center">
-    <div class="row">
-        <div class="col-lg-8 col-lg-offset-2">
-
-          {{ page.content | markdownify }}
-
-	  <ul class="timeline">
-
-	    {% for event in site.events %}
-              {% assign loopindex = forloop.index | modulo: 2 %}
-              {% capture class %}
-              {% if loopindex == 0 %}
-                timeline-inverted
-              {% endif %}
-              {% endcapture %}
-
-              <li class="{{ class }}">
-                  <div class="timeline-image">
-                      <a href="{{ event.url }}">{% include optimized-image.html src=event.image alt=event.date class="img-circle img-responsive" lazy=true %}</a>
-                  </div>
-                  <div class="timeline-panel">
-                      <div class="timeline-heading">
-                          <h4>{{ event.date }}</h4>
-                      </div>
-                      <div class="timeline-body">
-                          <p class="text-muted">{{ event.description | markdownify }}</p>
-                      </div>
-                  </div>
-              </li>
-            {% endfor %}
-
-            <li class="timeline-inverted">
-              <div class="timeline-image">
-                <a href="https://en.wikipedia.org/wiki/Pneumodesmus">{% include optimized-image.html src=site.career-img alt="Career timeline start" class="img-circle img-responsive" lazy=true %}</a>
-              </div>
-            </li>
-
-          </ul>
+<section id="{{ page.title }}" class="career-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+                {{ page.content | markdownify }}
+                
+                <div class="custom-timeline">
+                    <div class="timeline-line"></div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/future.png" alt="2025 - Present" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2025 - Present</div>
+                            <div class="timeline-text">Stealth Startup</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/airbnb.jpg" alt="2017 - 2025" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2017 - 2025</div>
+                            <div class="timeline-text">Staff Software Engineer (2017-2022) & Engineering Manager (2022-2025) @ <a href="https://www.airbnb.com/">Airbnb</a>.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/ebay.png" alt="2017 - 2017" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2017 - 2017</div>
+                            <div class="timeline-text">Mobile Application Architect @ <a href="https://www.close5.com/">eBay</a>.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/league.png" alt="2016 - 2017" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2016 - 2017</div>
+                            <div class="timeline-text">Lead iOS & Android Engineer @ <a href="https://www.theleague.com/">The League</a> dating app (Acquired by <a href="https://www.matchgroup.com/">Match Group</a>).</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/myroll.png" alt="2013 - 2016" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2013 - 2016</div>
+                            <div class="timeline-text">Lead iOS Engineer @ MyRoll (Acquired by <a href="https://en.wikipedia.org/wiki/AVG_Technologies#:~:text=and%20an%20Israeli-based%20gallery%20app%20company%20called%20MyRoll">AVG Technologies</a>)<br>Worked on <a href="https://gallery-doctor.en.uptodown.com/android">Gallery Doctor</a> and <a href="https://myroll.en.uptodown.com/android">MyRoll</a></div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/drippler.png" alt="2011 - 2013" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2011 - 2013</div>
+                            <div class="timeline-text">Lead iOS Engineer @ <a href="https://en.wikipedia.org/wiki/Asurion#:~:text=Through%20Soluto%2C%20Asurion%20acquired%20in,phone%20and%20electronics%20repair%20chain.">Drippler</a> (Acquired by <a href="https://en.wikipedia.org/wiki/Asurion#:~:text=Through%20Soluto%2C%20Asurion%20acquired%20in,phone%20and%20electronics%20repair%20chain.">Asurion</a>)<br>Created Drippler's app for iOS and <a href="https://drippler-top-android-tips.en.uptodown.com/android">Android</a></div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/bqr.png" alt="2007 - 2011" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2007 - 2011</div>
+                            <div class="timeline-text">Senior Software Engineer @ <a href="https://www.bqr.com">BQR</a></div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/bgu.png" alt="2007 - 2010" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2007 - 2010</div>
+                            <div class="timeline-text">Bachelor studies @ <a href="https://www.cs.bgu.ac.il">Ben Gurion University</a> in Computer Science</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry">
+                        <div class="timeline-icon">
+                            <img src="/img/career/idf.jpg" alt="2004 - 2007" class="icon-img">
+                        </div>
+                        <div class="timeline-card">
+                            <div class="timeline-date">2004 - 2007</div>
+                            <div class="timeline-text">Senior Software Engineer @ <a href="https://www.idfblog.com/blog/2012/01/05/virtual-reality-the-idf-ground-forces-battle-lab/">Battle Lab / Israel Defense Forces</a></div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-entry timeline-start">
+                        <div class="timeline-icon">
+                            <img src="/img/career/default.jpg" alt="Career timeline start" class="icon-img">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
-

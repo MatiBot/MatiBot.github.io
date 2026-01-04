@@ -29,6 +29,100 @@ $('.navbar-collapse ul li a').click(function() {
     $('.navbar-toggle:visible').click();
 });
 
+// Modern Timeline and Bio Scroll Animations
+(function() {
+    'use strict';
+    
+    // Intersection Observer for timeline items
+    function initTimelineAnimations() {
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        
+        if (!timelineItems.length) return;
+        
+        // Only animate items that aren't already visible
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry, index) {
+                if (entry.isIntersecting) {
+                    setTimeout(function() {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        timelineItems.forEach(function(item) {
+            observer.observe(item);
+        });
+    }
+    
+    // Intersection Observer for bio sections
+    function initBioAnimations() {
+        const bioSections = document.querySelectorAll('.bio-section');
+        
+        if (!bioSections.length) return;
+        
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -30px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry, index) {
+                if (entry.isIntersecting) {
+                    setTimeout(function() {
+                        entry.target.classList.add('visible');
+                    }, index * 150);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        bioSections.forEach(function(section) {
+            observer.observe(section);
+        });
+    }
+    
+    // Smooth parallax effect for timeline line
+    function initTimelineParallax() {
+        const timelineLine = document.querySelector('.timeline-line');
+        if (!timelineLine) return;
+        
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const timelineSection = timelineLine.closest('.modern-timeline');
+            if (!timelineSection) return;
+            
+            const timelineTop = timelineSection.getBoundingClientRect().top + scrolled;
+            const timelineHeight = timelineSection.offsetHeight;
+            const windowHeight = window.innerHeight;
+            
+            if (scrolled + windowHeight > timelineTop && scrolled < timelineTop + timelineHeight) {
+                const progress = (scrolled + windowHeight - timelineTop) / (timelineHeight + windowHeight);
+                timelineLine.style.opacity = Math.min(1, Math.max(0.3, progress));
+            }
+        }, { passive: true });
+    }
+    
+    // Initialize animations when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            initTimelineAnimations();
+            initBioAnimations();
+            initTimelineParallax();
+        });
+    } else {
+        initTimelineAnimations();
+        initBioAnimations();
+        initTimelineParallax();
+    }
+})();
+
 // Google Maps Scripts
 // When the window has finished loading create our google map below
 google.maps.event.addDomListener(window, 'load', init);
