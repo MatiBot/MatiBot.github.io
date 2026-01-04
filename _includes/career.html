@@ -17,7 +17,7 @@
 
               <li class="{{ class }}">
                   <div class="timeline-image">
-                      <a href="{{ event.url }}"><img class="img-circle img-responsive" src="{{ event.image }}" alt=""></a>
+                      <a href="{{ event.url }}"><img class="img-circle img-responsive" src="{{ event.image }}" alt="{{ event.date }} - {{ event.description | strip_html | truncatewords: 5 }}"></a>
                   </div>
                   <div class="timeline-panel">
                       <div class="timeline-heading">
@@ -32,7 +32,7 @@
 
             <li class="timeline-inverted">
               <div class="timeline-image">
-                <a href="https://en.wikipedia.org/wiki/Pneumodesmus"><img class="img-circle img-responsive" src="{{ site.career-img }}" alt=""></a>
+                <a href="https://en.wikipedia.org/wiki/Pneumodesmus"><img class="img-circle img-responsive" src="{{ site.career-img }}" alt="Career timeline start"></a>
               </div>
             </li>
 
@@ -41,8 +41,3 @@
     </div>
 </section>
 
-<script type="text/javascript">
-function AlertIt() {
-  alert ("The iOS version will be back soon.")
-}
-</script>
