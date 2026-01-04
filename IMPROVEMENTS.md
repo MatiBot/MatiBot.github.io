@@ -2,7 +2,7 @@
 
 This document outlines potential improvements for the mati.bot Jekyll website.
 
-**Last Updated:** January 2025 - Reorganized to prioritize pending items
+**Last Updated:** January 2025 - Reorganized with pending items prioritized at top, completed items at bottom
 
 ## Status Legend
 - ✅ **FIXED** - Issue has been resolved
@@ -13,66 +13,9 @@ This document outlines potential improvements for the mati.bot Jekyll website.
 
 ## 🔴 HIGH PRIORITY - Pending Issues
 
-_No high priority issues remaining._
+### Accessibility & Quick Wins
 
----
-
-## 🟡 MEDIUM PRIORITY - Resolved Issues
-
-_All medium priority issues have been resolved. Details below for reference._
-
-### Performance Optimizations
-
-#### 1. **CSS/JS Minification** ✅
-**Files:** Custom CSS/JS files
-
-**Status:** ✅ **FIXED** - Custom CSS/JS files are now minified where possible.
-
-**Implementation:**
-- ✅ Downloaded minified jQuery 3.7.1 (jquery.min.js)
-- ✅ Created npm build process with terser (JS) and clean-css-cli (CSS)
-- ✅ Hardcoded background image path in `grayscale.css` (removed Jekyll Liquid syntax)
-- ✅ Minified `grayscale.css` → `grayscale.min.css` (8.0K → 5.9K, 26% reduction)
-- ✅ Minified `grayscale.js` → `grayscale.min.js` (5.2K → 2.2K, 58% reduction)
-- ✅ Minified `timeline.css` → `timeline.min.css` (4.3K → 3.0K, 30% reduction)
-- ✅ Minified `syntax.css` → `syntax.min.css` (3.9K → 2.0K, 49% reduction)
-- ✅ Updated HTML templates to use minified versions
-
-**Build Process:** Run `npm run minify` to regenerate minified files after changes.
-
-**Impact:** Reduced CSS/JS file sizes by ~26-58%, saving ~14KB total and improving page load times.
-
-#### 2. **Cache Headers** ✅
-**Status:** ✅ **FIXED** - GitHub Pages automatically sets appropriate cache headers for static assets.
-
-**Note:** This is handled automatically by GitHub Pages/CDN configuration, requiring no code changes.
-
----
-
-## 🟢 LOW PRIORITY - Pending Issues
-
-### SEO Enhancements
-
-#### 3. **Missing Breadcrumbs** 🆕 ⚠️
-**Files:** Post and blog layouts
-
-**Issue:** No breadcrumb navigation for better UX and SEO.
-
-**Recommendation:** Add breadcrumb navigation showing: Home > Blog > Post Title with JSON-LD breadcrumb schema.
-
-#### 4. **Enhanced Structured Data** ⚠️
-**File:** `_includes/head.html` (lines 44-67)
-
-**Issue:** JSON-LD structured data is present but could be enhanced.
-
-**Recommendation:** Consider adding:
-- `mainEntityOfPage` property for BlogPosting schema
-- `articleSection` or `keywords` for better categorization
-- `inLanguage` property
-
-### Accessibility Improvements
-
-#### 5. **Navigation Button Accessibility** 🆕 ⚠️
+#### 1. **Navigation Button Accessibility** 🆕 ⚠️
 **File:** `_includes/navigation.html` (line 5)
 
 **Issue:** Uses `sr-only` class for screen reader text, but could be improved.
@@ -82,36 +25,7 @@ _All medium priority issues have been resolved. Details below for reference._
 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse" aria-label="Toggle navigation menu" aria-expanded="false">
 ```
 
-#### 6. **Missing Semantic HTML5 Elements** 🆕 ⚠️
-**Files:** All layout files
-
-**Issue:** Using generic `<section>` and `<div>` elements instead of semantic HTML5 elements.
-
-**Recommendation:** Use semantic elements:
-- `<main>` for main content area
-- `<article>` for blog posts
-- `<header>` and `<footer>` where appropriate
-
-#### 7. **Missing ARIA Landmarks** 🆕 ⚠️
-**Files:** Layout files
-
-**Issue:** While semantic HTML helps, explicit ARIA landmarks can improve screen reader navigation.
-
-**Recommendation:** Add ARIA roles where appropriate (or use semantic HTML5 elements which is preferred).
-
-### Security
-
-#### 8. **Content Security Policy** ⚠️
-**Issue:** No Content Security Policy (CSP) header to help prevent XSS attacks.
-
-**Recommendation:** 
-- GitHub Pages doesn't support custom headers in `_config.yml`
-- CSP would need to be set via a proxy/CDN (Cloudflare, etc.)
-- Or included via meta tag in `<head>` (less secure but functional)
-
-### User Experience
-
-#### 9. **Missing Reading Time** 🆕 ⚠️
+#### 2. **Missing Reading Time** 🆕 ⚠️
 **Files:** `_layouts/post.html`, `_layouts/blog.html`
 
 **Issue:** No reading time estimate for blog posts.
@@ -121,7 +35,39 @@ _All medium priority issues have been resolved. Details below for reference._
 - Or calculate manually: `{{ page.content | number_of_words | divided_by: 200 }} min read`
 - Display next to post date
 
-#### 10. **Missing Last Modified Date** 🆕 ⚠️
+#### 3. **Missing Favicon Variants** 🆕 ⚠️
+**File:** `_includes/head.html` (line 42)
+
+**Issue:** Only one favicon link. Modern browsers support multiple sizes and formats.
+
+**Recommendation:** Add multiple favicon sizes and formats (32x32, 16x16, apple-touch-icon).
+
+---
+
+## 🟡 MEDIUM PRIORITY - Pending Issues
+
+### SEO Enhancements
+
+#### 4. **Missing Breadcrumbs** 🆕 ⚠️
+**Files:** Post and blog layouts
+
+**Issue:** No breadcrumb navigation for better UX and SEO.
+
+**Recommendation:** Add breadcrumb navigation showing: Home > Blog > Post Title with JSON-LD breadcrumb schema.
+
+#### 5. **Enhanced Structured Data** ⚠️
+**File:** `_includes/head.html` (lines 44-67)
+
+**Issue:** JSON-LD structured data is present but could be enhanced.
+
+**Recommendation:** Consider adding:
+- `mainEntityOfPage` property for BlogPosting schema
+- `articleSection` or `keywords` for better categorization
+- `inLanguage` property
+
+### User Experience
+
+#### 6. **Missing Last Modified Date** 🆕 ⚠️
 **Files:** `_layouts/post.html`
 
 **Issue:** Only shows publication date, not last modified date.
@@ -131,7 +77,34 @@ _All medium priority issues have been resolved. Details below for reference._
 - Or use Git to track last commit date
 - Display "Last updated: [date]" if different from publication date
 
-#### 11. **Missing Print Styles** 🆕 ⚠️
+### Accessibility Improvements
+
+#### 7. **Missing Semantic HTML5 Elements** 🆕 ⚠️
+**Files:** All layout files
+
+**Issue:** Using generic `<section>` and `<div>` elements instead of semantic HTML5 elements.
+
+**Recommendation:** Use semantic elements:
+- `<main>` for main content area
+- `<article>` for blog posts
+- `<header>` and `<footer>` where appropriate
+
+---
+
+## 🟢 LOW PRIORITY - Pending Issues
+
+### Accessibility Improvements
+
+#### 8. **Missing ARIA Landmarks** 🆕 ⚠️
+**Files:** Layout files
+
+**Issue:** While semantic HTML helps, explicit ARIA landmarks can improve screen reader navigation.
+
+**Recommendation:** Add ARIA roles where appropriate (or use semantic HTML5 elements which is preferred).
+
+### User Experience
+
+#### 9. **Missing Print Styles** 🆕 ⚠️
 **File:** CSS files
 
 **Issue:** No print-specific CSS for better printing experience.
@@ -141,7 +114,7 @@ _All medium priority issues have been resolved. Details below for reference._
 - Optimize colors for printing
 - Ensure content fits page width
 
-#### 12. **Missing Dark Mode Support** 🆕 ⚠️
+#### 10. **Missing Dark Mode Support** 🆕 ⚠️
 **Files:** CSS files
 
 **Issue:** No dark mode support for modern user preferences.
@@ -151,16 +124,19 @@ _All medium priority issues have been resolved. Details below for reference._
 - Or add manual dark mode toggle
 - Consider using CSS variables for easier theming
 
-#### 13. **Missing Favicon Variants** 🆕 ⚠️
-**File:** `_includes/head.html` (line 42)
+### Security
 
-**Issue:** Only one favicon link. Modern browsers support multiple sizes and formats.
+#### 11. **Content Security Policy** ⚠️
+**Issue:** No Content Security Policy (CSP) header to help prevent XSS attacks.
 
-**Recommendation:** Add multiple favicon sizes and formats (32x32, 16x16, apple-touch-icon).
+**Recommendation:** 
+- GitHub Pages doesn't support custom headers in `_config.yml`
+- CSP would need to be set via a proxy/CDN (Cloudflare, etc.)
+- Or included via meta tag in `<head>` (less secure but functional)
 
 ### Modern Web Standards
 
-#### 14. **Bootstrap Version** ⚠️
+#### 12. **Bootstrap Version** ⚠️
 **Observation:** Using Bootstrap 3 (based on class names like `col-lg-offset-2`, `navbar-fixed-top`).
 
 **Status:** Bootstrap 3 is still functional but outdated. Consider upgrading to Bootstrap 4 or 5 for:
@@ -174,24 +150,12 @@ _All medium priority issues have been resolved. Details below for reference._
 
 **Priority:** Low - Only consider if planning a major redesign.
 
-#### 15. **jQuery Dependency** ⚠️
+#### 13. **jQuery Dependency** ⚠️
 **Observation:** Using jQuery 3.7.1 (modern version, good).
 
 **Status:** jQuery is required for Bootstrap 3. If upgrading to Bootstrap 5, jQuery is no longer needed.
 
 **Priority:** Low - Only relevant if upgrading Bootstrap.
-
-### Modern Web Features
-
-#### 16. **Missing Web App Manifest** ✅
-**File:** Root directory
-
-**Status:** ✅ **FIXED** - `manifest.json` exists and is linked in `head.html` for PWA support.
-
-**Implementation:**
-- ✅ `manifest.json` file exists in root directory with proper PWA configuration
-- ✅ Manifest link added to `_includes/head.html` (line 54)
-- ✅ Enables "Add to Home Screen" functionality and app-like experience on mobile devices
 
 ---
 
@@ -218,8 +182,33 @@ The following issues have been fixed and are documented here for reference:
 - ✅ **.jekyll-cache in .gitignore** - Added `.jekyll-cache/` to `.gitignore` to prevent cache files from being tracked
 - ✅ **Backup File in Root Directory** - Removed `feed.xml.manual.backup` from repository (`.gitignore` already includes `*.backup` pattern)
 
-### Performance
-- ✅ **CSS/JS Minification** - Minified all custom CSS/JS files using npm build process (terser + clean-css-cli), reducing file sizes by 26-58% and saving ~14KB total
+### Performance Optimizations
+
+#### CSS/JS Minification ✅
+**Files:** Custom CSS/JS files
+
+**Status:** ✅ **FIXED** - Custom CSS/JS files are now minified where possible.
+
+**Implementation:**
+- ✅ Downloaded minified jQuery 3.7.1 (jquery.min.js)
+- ✅ Created npm build process with terser (JS) and clean-css-cli (CSS)
+- ✅ Hardcoded background image path in `grayscale.css` (removed Jekyll Liquid syntax)
+- ✅ Minified `grayscale.css` → `grayscale.min.css` (8.0K → 5.9K, 26% reduction)
+- ✅ Minified `grayscale.js` → `grayscale.min.js` (5.2K → 2.2K, 58% reduction)
+- ✅ Minified `timeline.css` → `timeline.min.css` (4.3K → 3.0K, 30% reduction)
+- ✅ Minified `syntax.css` → `syntax.min.css` (3.9K → 2.0K, 49% reduction)
+- ✅ Updated HTML templates to use minified versions
+
+**Build Process:** Run `npm run minify` to regenerate minified files after changes.
+
+**Impact:** Reduced CSS/JS file sizes by ~26-58%, saving ~14KB total and improving page load times.
+
+#### Cache Headers ✅
+**Status:** ✅ **FIXED** - GitHub Pages automatically sets appropriate cache headers for static assets.
+
+**Note:** This is handled automatically by GitHub Pages/CDN configuration, requiring no code changes.
+
+#### Other Performance Improvements
 - ✅ **Image Optimization** - Optimized all large images (18.89 MB → 2.67 MB WebP = 85.8% reduction)
   - Generated WebP versions for all optimized images
   - Created `_includes/optimized-image.html` include for WebP with fallbacks
@@ -230,7 +219,6 @@ The following issues have been fixed and are documented here for reference:
 - ✅ **JavaScript Loading Strategy** - Scripts properly use `defer` attribute
 - ✅ **External Script Security** - Comments explain SRI approach for dynamic scripts
 - ✅ **Missing DNS Prefetch Hints** - Added DNS prefetch hints for Disqus, Twitter, Facebook, and Google Analytics with conditional rendering
-- ✅ **Cache Headers** - GitHub Pages automatically sets appropriate cache headers for static assets (no code changes needed)
 
 ### SEO & Accessibility
 - ✅ **Language Attribute** - HTML tag has `lang="en"` in all layouts
@@ -244,6 +232,9 @@ The following issues have been fixed and are documented here for reference:
 
 ### Modern Web Features
 - ✅ **Missing Web App Manifest** - `manifest.json` exists and is linked in `head.html` for PWA support
+  - ✅ `manifest.json` file exists in root directory with proper PWA configuration
+  - ✅ Manifest link added to `_includes/head.html` (line 54)
+  - ✅ Enables "Add to Home Screen" functionality and app-like experience on mobile devices
 
 ### Security
 - ✅ **Open Redirect Risk** - Fixed 404 redirect to use `window.location.origin` for security
@@ -258,11 +249,11 @@ The following issues have been fixed and are documented here for reference:
 
 ## Summary
 
-**Total Issues:** 14 pending, 32 completed
+**Total Issues:** 13 pending, 32 completed
 
 **Priority Breakdown:**
-- 🔴 High Priority: 0 issues ✅
-- 🟡 Medium Priority: 0 issues ✅
-- 🟢 Low Priority: 14 issues
+- 🔴 High Priority: 3 issues (quick accessibility/UX wins)
+- 🟡 Medium Priority: 4 issues (SEO and UX improvements)
+- 🟢 Low Priority: 6 issues (nice-to-have features and major refactors)
 
-**Recommendation:** All high and medium priority issues are resolved. CSS/JS minification and cache headers are now complete, providing significant performance improvements. Low-priority items like breadcrumbs, reading time, or accessibility improvements can provide quick wins.
+**Recommendation:** Focus on high-priority items first as they provide quick wins with immediate impact. Navigation button accessibility, reading time, and favicon variants are straightforward improvements. Medium-priority items like breadcrumbs and enhanced structured data will improve SEO, while low-priority items can be addressed during major updates or redesigns.
