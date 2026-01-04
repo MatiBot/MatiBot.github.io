@@ -6,7 +6,14 @@
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
     <meta name="theme-color" content="#000000">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="index, follow">
     <title>{{ site.title }} {% if page.title %} | {{ page.title }}{% endif %}</title>
+
+    <!-- DNS Prefetch for External Services -->
+    {% if site.disqus-shortname %}<link rel="dns-prefetch" href="//disqus.com">{% endif %}
+    {% if site.twitter-share %}<link rel="dns-prefetch" href="//platform.twitter.com">{% endif %}
+    {% if site.fb-share %}<link rel="dns-prefetch" href="//connect.facebook.net">{% endif %}
+    {% if site.google-tracking-id %}<link rel="dns-prefetch" href="//www.googletagmanager.com">{% endif %}
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="{% if page.section-type == 'post' %}article{% else %}website{% endif %}">
