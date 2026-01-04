@@ -1,0 +1,17 @@
+{
+  "name": "mati.bot - Website of Mati Bot",
+  "short_name": "mati.bot",
+  "description": "Website of Mati Bot",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/img/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

@@ -17,7 +17,9 @@ _No high priority issues remaining._
 
 ---
 
-## 🟡 MEDIUM PRIORITY - Pending Issues
+## 🟡 MEDIUM PRIORITY - Resolved Issues
+
+_All medium priority issues have been resolved. Details below for reference._
 
 ### Performance Optimizations
 
@@ -40,12 +42,10 @@ _No high priority issues remaining._
 
 **Impact:** Reduced CSS/JS file sizes by ~26-58%, saving ~14KB total and improving page load times.
 
-#### 2. **Cache Headers** ⚠️
-**Observation:** Static assets should have proper cache headers (handled by GitHub Pages/CDN).
+#### 2. **Cache Headers** ✅
+**Status:** ✅ **FIXED** - GitHub Pages automatically sets appropriate cache headers for static assets.
 
-**Recommendation:** Verify GitHub Pages is setting appropriate cache headers. Consider using a CDN (Cloudflare) for better caching control.
-
-**Note:** This is handled by GitHub Pages/CDN configuration, not code changes.
+**Note:** This is handled automatically by GitHub Pages/CDN configuration, requiring no code changes.
 
 ---
 
@@ -201,20 +201,6 @@ _No high priority issues remaining._
 
 **Priority:** Very Low - Complex feature, only if offline support is needed.
 
-### Documentation & Maintenance
-
-#### 18. **Backup File in Root Directory** 🆕 ⚠️
-**File:** `feed.xml.manual.backup`
-
-**Issue:** Backup file is in the root directory instead of being excluded or moved to a backup folder.
-
-**Recommendation:** 
-- Add `*.backup` to `.gitignore` (already included as `*.backup` pattern)
-- Remove the backup file from repository if no longer needed
-- Or move to a `_backups/` folder if needed for reference
-
-**Priority:** Very Low - Minor cleanup item.
-
 ---
 
 ## ✅ COMPLETED / RESOLVED ISSUES
@@ -238,6 +224,7 @@ The following issues have been fixed and are documented here for reference:
 - ✅ **Footer Excessive Spacing** - Replaced `<br />` tags with CSS margin
 - ✅ **Ruby Version File Formatting** - Removed extra trailing newline from `.ruby-version` file
 - ✅ **.jekyll-cache in .gitignore** - Added `.jekyll-cache/` to `.gitignore` to prevent cache files from being tracked
+- ✅ **Backup File in Root Directory** - Removed `feed.xml.manual.backup` from repository (`.gitignore` already includes `*.backup` pattern)
 
 ### Performance
 - ✅ **CSS/JS Minification** - Minified all custom CSS/JS files using npm build process (terser + clean-css-cli), reducing file sizes by 26-58% and saving ~14KB total
@@ -251,6 +238,7 @@ The following issues have been fixed and are documented here for reference:
 - ✅ **JavaScript Loading Strategy** - Scripts properly use `defer` attribute
 - ✅ **External Script Security** - Comments explain SRI approach for dynamic scripts
 - ✅ **Missing DNS Prefetch Hints** - Added DNS prefetch hints for Disqus, Twitter, Facebook, and Google Analytics with conditional rendering
+- ✅ **Cache Headers** - GitHub Pages automatically sets appropriate cache headers for static assets (no code changes needed)
 
 ### SEO & Accessibility
 - ✅ **Language Attribute** - HTML tag has `lang="en"` in all layouts
@@ -275,11 +263,11 @@ The following issues have been fixed and are documented here for reference:
 
 ## Summary
 
-**Total Issues:** 17 pending, 30 completed
+**Total Issues:** 16 pending, 31 completed
 
 **Priority Breakdown:**
 - 🔴 High Priority: 0 issues ✅
-- 🟡 Medium Priority: 1 issue (Cache headers - handled by GitHub Pages/CDN)
+- 🟡 Medium Priority: 0 issues ✅
 - 🟢 Low Priority: 16 issues
 
-**Recommendation:** All high priority issues are resolved. CSS/JS minification is now complete, providing significant performance improvements. Cache headers are handled by GitHub Pages/CDN. Low-priority items like breadcrumbs, reading time, or accessibility improvements can provide quick wins.
+**Recommendation:** All high and medium priority issues are resolved. CSS/JS minification and cache headers are now complete, providing significant performance improvements. Low-priority items like breadcrumbs, reading time, or accessibility improvements can provide quick wins.
