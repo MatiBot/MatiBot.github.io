@@ -1,2 +1,15 @@
 _site/
 .sass-cache/
+
+# Backup files
+*.old
+*.bak
+*.backup
+
+# Editor files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
