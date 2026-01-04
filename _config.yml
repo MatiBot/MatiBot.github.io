@@ -43,12 +43,12 @@ reddit-share: True
 
 events:
   - image: "/img/career/future.png"
-    date: "Future"
-    description: "Have an interesting project to work on? Contact me <a href=\"mailto:hi@mati.bot\">here</a> "
+    date: "2025 - Present"
+    description: "Stealth Startup"
     url: "mailto:hi@mati.bot"
   - image: "/img/career/airbnb.jpg"
-    date: "2017 - Today"
-    description: "Software Engineer @ <a href=\"https://www.airbnb.com/\">Airbnb</a>."
+    date: "2017 - 2025"
+    description: "Staff Software Engineer (2017-2022) & Engineering Manager (2022-2025) @ <a href=\"https://www.airbnb.com/\">Airbnb</a>."
     url: "https://www.airbnb.com"
   - image: "/img/career/ebay.png"
     date: "2017 - 2017"
