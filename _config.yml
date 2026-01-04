@@ -102,6 +102,7 @@ social:
 plugins:
   - jekyll-paginate
   - jekyll-feed
+  - jekyll-sitemap
 
 # Exclusion list from the generated _site
 exclude: ["Rakefile", "LICENSE", "readme.markdown", "vendor"]

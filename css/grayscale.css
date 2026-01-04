@@ -167,7 +167,8 @@ a:focus {
 
 @media(min-width:767px) {
     .intro {
-        height: 100%;
+        height: 100vh;
+        min-height: 100vh;
         padding: 0;
     }
 
@@ -405,4 +406,34 @@ body {
     float: left;
     padding: 0 5px;
     vertical-align: top;
+}
+
+/* Skip to content link for accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 100;
+    width: auto;
+    height: auto;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Reset main element to prevent layout shifts */
+main {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+/* Ensure main doesn't interfere with full-height intro section */
+main > .intro {
+    display: table;
 }
