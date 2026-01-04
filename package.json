@@ -1,0 +1,15 @@
+{
+  "name": "matibot-site",
+  "version": "1.0.0",
+  "description": "Minification build tools for MatiBot Jekyll site",
+  "scripts": {
+    "minify:js": "terser js/grayscale.js -o js/grayscale.min.js -c -m",
+    "minify:css": "cleancss -o css/timeline.min.css css/timeline.css && cleancss -o css/syntax.min.css css/syntax.css",
+    "minify": "npm run minify:js && npm run minify:css"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.2",
+    "terser": "^5.26.0"
+  }
+}
+

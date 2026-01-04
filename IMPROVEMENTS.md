@@ -21,25 +21,25 @@ _No high priority issues remaining._
 
 ### Performance Optimizations
 
-#### 1. **CSS/JS Minification** ⚠️
+#### 1. **CSS/JS Minification** ✅
 **Files:** Custom CSS/JS files
 
-**Issue:** Using `bootstrap.min.css` and `bootstrap.min.js` (good), but custom CSS/JS may not be minified.
+**Status:** ✅ **FIXED** - Custom CSS/JS files are now minified where possible.
 
-**Details:**
-- `jquery.js` is not minified (jquery.min.js does not exist in the repository)
-- `grayscale.css`, `timeline.css`, `syntax.css` are not minified
-- `grayscale.js` is not minified
+**Implementation:**
+- ✅ Downloaded minified jQuery 3.7.1 (jquery.min.js)
+- ✅ Created npm build process with terser (JS) and clean-css-cli (CSS)
+- ✅ Minified `grayscale.js` → `grayscale.min.js` (5.2K → 2.2K, 58% reduction)
+- ✅ Minified `timeline.css` → `timeline.min.css` (4.3K → 3.0K, 30% reduction)
+- ✅ Minified `syntax.css` → `syntax.min.css` (3.9K → 2.0K, 49% reduction)
+- ⚠️ `grayscale.css` kept unminified - contains Jekyll Liquid syntax (`{{ site.background-img }}`) that requires Jekyll processing
+- ✅ Updated HTML templates to use minified versions where applicable
 
-**Recommendation:**
-- Download minified jQuery from CDN or official source if needed
-- Minify `grayscale.css`, `timeline.css`, `syntax.css` using a build process or Jekyll plugin
-- Minify `grayscale.js` using a build process or Jekyll plugin
-- Consider using Jekyll plugins like `jekyll-compress-html` or a build process (npm scripts, etc.)
+**Build Process:** Run `npm run minify` to regenerate minified files after changes.
 
-**Impact:** Reduces file sizes and improves page load times.
+**Note:** `grayscale.css` cannot be pre-minified as it contains Jekyll Liquid variables that must be processed by Jekyll at build time.
 
-**Note:** Minification of custom files requires a build process or Jekyll plugin. Current setup uses standard unminified files which is acceptable for development but could be optimized for production.
+**Impact:** Reduced CSS/JS file sizes by ~30-58% for files that can be minified, improving page load times.
 
 #### 2. **Cache Headers** ⚠️
 **Observation:** Static assets should have proper cache headers (handled by GitHub Pages/CDN).
@@ -241,6 +241,7 @@ The following issues have been fixed and are documented here for reference:
 - ✅ **.jekyll-cache in .gitignore** - Added `.jekyll-cache/` to `.gitignore` to prevent cache files from being tracked
 
 ### Performance
+- ✅ **CSS/JS Minification** - Minified custom CSS/JS files using npm build process (terser + clean-css-cli), reducing file sizes by 30-58% (note: grayscale.css kept unminified due to Jekyll Liquid syntax)
 - ✅ **Image Optimization** - Optimized all large images (18.89 MB → 2.67 MB WebP = 85.8% reduction)
   - Generated WebP versions for all optimized images
   - Created `_includes/optimized-image.html` include for WebP with fallbacks
@@ -275,11 +276,11 @@ The following issues have been fixed and are documented here for reference:
 
 ## Summary
 
-**Total Issues:** 18 pending, 29 completed
+**Total Issues:** 17 pending, 30 completed
 
 **Priority Breakdown:**
 - 🔴 High Priority: 0 issues ✅
-- 🟡 Medium Priority: 2 issues (Performance optimizations)
+- 🟡 Medium Priority: 1 issue (Cache headers - handled by GitHub Pages/CDN)
 - 🟢 Low Priority: 16 issues
 
-**Recommendation:** All high priority issues are resolved. Focus on medium priority performance optimizations (CSS/JS minification, cache headers) for the biggest impact. Low-priority items like breadcrumbs, reading time, or accessibility improvements can provide quick wins.
+**Recommendation:** All high priority issues are resolved. CSS/JS minification is now complete, providing significant performance improvements. Cache headers are handled by GitHub Pages/CDN. Low-priority items like breadcrumbs, reading time, or accessibility improvements can provide quick wins.
