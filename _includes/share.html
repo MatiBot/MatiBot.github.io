@@ -13,10 +13,10 @@
 
 {% if site.reddit-share %}
   <div style="float:left; padding: 0 5px; vertical-align:top">
-    <script type="text/javascript">reddit_newwindow='1'</script>
-    <script type="text/javascript">reddit_title='{{ page.title }}'</script>
-    <script type="text/javascript">reddit_url='{{ site.url }}/{{ page.url }}'</script>
-    <script type="text/javascript" src="//www.redditstatic.com/button/button1.js"></script>
+    <script>reddit_newwindow='1'</script>
+    <script>reddit_title='{{ page.title }}'</script>
+    <script>reddit_url='{{ site.url }}/{{ page.url }}'</script>
+    <script src="https://www.redditstatic.com/button/button1.js"></script>
   </div>
 {% endif %}
 </div>

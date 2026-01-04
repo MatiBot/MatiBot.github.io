@@ -3,7 +3,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="{{ site.description }}" />
     <meta name="author" content="{{ site.author }}" />
-    <meta name="keywords" content="{{ site.keywords }}" />
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
     {% if page.url == "/404.html" %}
       <meta http-equiv="refresh" content="20; url=/">
@@ -36,9 +35,10 @@
     <link href="/css/syntax.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ site.favicon }}">
 
@@ -53,14 +53,16 @@
       {% if page.section-type == 'post' %}
       "headline": "{{ page.title }}",
       "datePublished": "{{ page.date | date_to_xmlschema }}",
+      {% if page.last_modified_at %}"dateModified": "{{ page.last_modified_at | date_to_xmlschema }}",{% elsif page.date %}"dateModified": "{{ page.date | date_to_xmlschema }}",{% endif %}
       "author": {
         "@type": "Person",
-        "name": "{{ site.title }}"
+        "name": "{{ site.author }}"
       },
+      {% if page.image %}"image": "{{ page.image | prepend: site.url }}",{% endif %}
       {% endif %}
       "publisher": {
         "@type": "Person",
-        "name": "{{ site.title }}"
+        "name": "{{ site.author }}"
       }
     }
     </script>
