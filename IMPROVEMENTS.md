@@ -15,17 +15,7 @@ This document outlines potential improvements for the mati.bot Jekyll website.
 
 ### Accessibility & Quick Wins
 
-#### 1. **Navigation Button Accessibility** 🆕 ⚠️
-**File:** `_includes/navigation.html` (line 5)
-
-**Issue:** Uses `sr-only` class for screen reader text, but could be improved.
-
-**Recommendation:** Add explicit `aria-label` attribute:
-```html
-<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse" aria-label="Toggle navigation menu" aria-expanded="false">
-```
-
-#### 2. **Missing Reading Time** 🆕 ⚠️
+#### 1. **Missing Reading Time** 🆕 ⚠️
 **Files:** `_layouts/post.html`, `_layouts/blog.html`
 
 **Issue:** No reading time estimate for blog posts.
@@ -35,35 +25,9 @@ This document outlines potential improvements for the mati.bot Jekyll website.
 - Or calculate manually: `{{ page.content | number_of_words | divided_by: 200 }} min read`
 - Display next to post date
 
-#### 3. **Missing Favicon Variants** 🆕 ⚠️
-**File:** `_includes/head.html` (line 42)
-
-**Issue:** Only one favicon link. Modern browsers support multiple sizes and formats.
-
-**Recommendation:** Add multiple favicon sizes and formats (32x32, 16x16, apple-touch-icon).
-
 ---
 
 ## 🟡 MEDIUM PRIORITY - Pending Issues
-
-### SEO Enhancements
-
-#### 4. **Missing Breadcrumbs** 🆕 ⚠️
-**Files:** Post and blog layouts
-
-**Issue:** No breadcrumb navigation for better UX and SEO.
-
-**Recommendation:** Add breadcrumb navigation showing: Home > Blog > Post Title with JSON-LD breadcrumb schema.
-
-#### 5. **Enhanced Structured Data** ⚠️
-**File:** `_includes/head.html` (lines 44-67)
-
-**Issue:** JSON-LD structured data is present but could be enhanced.
-
-**Recommendation:** Consider adding:
-- `mainEntityOfPage` property for BlogPosting schema
-- `articleSection` or `keywords` for better categorization
-- `inLanguage` property
 
 ### User Experience
 
@@ -104,17 +68,7 @@ This document outlines potential improvements for the mati.bot Jekyll website.
 
 ### User Experience
 
-#### 9. **Missing Print Styles** 🆕 ⚠️
-**File:** CSS files
-
-**Issue:** No print-specific CSS for better printing experience.
-
-**Recommendation:** Add `@media print` styles:
-- Hide navigation, footer, social buttons
-- Optimize colors for printing
-- Ensure content fits page width
-
-#### 10. **Missing Dark Mode Support** 🆕 ⚠️
+#### 9. **Missing Dark Mode Support** 🆕 ⚠️
 **Files:** CSS files
 
 **Issue:** No dark mode support for modern user preferences.
@@ -125,14 +79,6 @@ This document outlines potential improvements for the mati.bot Jekyll website.
 - Consider using CSS variables for easier theming
 
 ### Security
-
-#### 11. **Content Security Policy** ⚠️
-**Issue:** No Content Security Policy (CSP) header to help prevent XSS attacks.
-
-**Recommendation:** 
-- GitHub Pages doesn't support custom headers in `_config.yml`
-- CSP would need to be set via a proxy/CDN (Cloudflare, etc.)
-- Or included via meta tag in `<head>` (less secure but functional)
 
 ### Modern Web Standards
 
@@ -219,16 +165,28 @@ The following issues have been fixed and are documented here for reference:
 - ✅ **JavaScript Loading Strategy** - Scripts properly use `defer` attribute
 - ✅ **External Script Security** - Comments explain SRI approach for dynamic scripts
 - ✅ **Missing DNS Prefetch Hints** - Added DNS prefetch hints for Disqus, Twitter, Facebook, and Google Analytics with conditional rendering
+- ✅ **Missing Print Styles** - Added `@media print` styles to `css/grayscale.css`
+  - Hides navigation, footer, social buttons, and breadcrumbs when printing
+  - Optimizes colors for printing (black text on white background)
+  - Ensures content fits page width
+  - Adds page-break controls for headings and paragraphs
 
 ### SEO & Accessibility
 - ✅ **Language Attribute** - HTML tag has `lang="en"` in all layouts
 - ✅ **Structured Data** - JSON-LD structured data present for BlogPosting and WebSite types
+- ✅ **Enhanced Structured Data** - Enhanced JSON-LD schema with `mainEntityOfPage`, `articleSection`, `keywords`, and `inLanguage` properties
+- ✅ **Missing Breadcrumbs** - Added breadcrumb navigation to post and blog layouts with JSON-LD breadcrumb schema
+  - Created `_includes/breadcrumbs.html` with semantic HTML and structured data
+  - Added breadcrumbs to `_layouts/post.html` and `_layouts/blog.html`
+  - Styled breadcrumbs to match site theme
 - ✅ **Image Alt Text** - Images have alt text in most places
 - ✅ **RSS Feed Enhancement** - Using `jekyll-feed` plugin for automatic feed generation
 - ✅ **Referrer Policy** - `strict-origin-when-cross-origin` is set in `head.html`
 - ✅ **Skip-to-Content Link** - Added skip link to all layouts with proper CSS styling and semantic `<main>` elements
 - ✅ **Sitemap.xml** - Added `jekyll-sitemap` plugin to `_config.yml` for automatic sitemap generation
 - ✅ **Missing Robots Meta Tag** - Added `<meta name="robots" content="index, follow">` to head.html
+- ✅ **Navigation Button Accessibility** - Added `aria-label="Toggle navigation menu"` and `aria-expanded="false"` attributes to navbar toggle button
+- ✅ **Missing Favicon Variants** - Verified multiple favicon sizes and formats are present (16x16, 32x32, apple-touch-icon) in `head.html`
 
 ### Modern Web Features
 - ✅ **Missing Web App Manifest** - `manifest.json` exists and is linked in `head.html` for PWA support
@@ -238,6 +196,9 @@ The following issues have been fixed and are documented here for reference:
 
 ### Security
 - ✅ **Open Redirect Risk** - Fixed 404 redirect to use `window.location.origin` for security
+- ✅ **Content Security Policy** - Added CSP meta tag to `head.html` to help prevent XSS attacks
+  - Configured to allow necessary external resources (Google Analytics, Disqus, Twitter, Facebook, Reddit, Google Fonts)
+  - Allows inline scripts and styles as required by the site's functionality
 
 ### Documentation & Maintenance
 - ✅ **README Enhancement** - Comprehensive documentation added
@@ -249,11 +210,11 @@ The following issues have been fixed and are documented here for reference:
 
 ## Summary
 
-**Total Issues:** 13 pending, 32 completed
+**Total Issues:** 7 pending, 38 completed
 
 **Priority Breakdown:**
-- 🔴 High Priority: 3 issues (quick accessibility/UX wins)
-- 🟡 Medium Priority: 4 issues (SEO and UX improvements)
-- 🟢 Low Priority: 6 issues (nice-to-have features and major refactors)
+- 🔴 High Priority: 1 issue (reading time estimate)
+- 🟡 Medium Priority: 2 issues (last modified date, semantic HTML5 elements)
+- 🟢 Low Priority: 4 issues (ARIA landmarks, dark mode, Bootstrap/jQuery considerations)
 
-**Recommendation:** Focus on high-priority items first as they provide quick wins with immediate impact. Navigation button accessibility, reading time, and favicon variants are straightforward improvements. Medium-priority items like breadcrumbs and enhanced structured data will improve SEO, while low-priority items can be addressed during major updates or redesigns.
+**Recommendation:** Focus on the remaining high-priority item (reading time) as it provides a quick UX win. Medium-priority items like last modified date and semantic HTML5 elements will improve user experience and accessibility. Low-priority items can be addressed during major updates or redesigns.

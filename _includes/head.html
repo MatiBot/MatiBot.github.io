@@ -7,6 +7,8 @@
     <meta name="theme-color" content="#000000">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="robots" content="index, follow">
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://platform.twitter.com https://connect.facebook.net https://*.disqus.com https://www.redditstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://*.disqus.com https://*.disquscdn.com; frame-src https://www.disqus.com https://platform.twitter.com https://www.facebook.com;">
     <title>{{ site.title }} {% if page.title %} | {{ page.title }}{% endif %}</title>
 
     <!-- DNS Prefetch for External Services -->
@@ -61,10 +63,17 @@
       "name": "{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}",
       "description": "{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}",
       "url": "{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}",
+      "inLanguage": "en",
       {% if page.section-type == 'post' %}
       "headline": "{{ page.title }}",
       "datePublished": "{{ page.date | date_to_xmlschema }}",
       {% if page.last_modified_at %}"dateModified": "{{ page.last_modified_at | date_to_xmlschema }}",{% elsif page.date %}"dateModified": "{{ page.date | date_to_xmlschema }}",{% endif %}
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}"
+      },
+      {% if page.category %}"articleSection": "{{ page.category }}"{% if page.tags %},{% else %},{% endif %}
+      {% endif %}{% if page.tags %}"keywords": "{% for tag in page.tags %}{{ tag }}{% unless forloop.last %}, {% endunless %}{% endfor %}",{% endif %}
       "author": {
         "@type": "Person",
         "name": "{{ site.author }}"

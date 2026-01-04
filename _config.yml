@@ -60,14 +60,14 @@ events:
     url: "https://www.theleague.com"
   - image: "/img/career/myroll.png"
     date: "2013 - 2016"
-    description: "Lead iOS Engineer @ MyRoll (Acquired by <a href=\"https://www.avg.com\">AVG Technologies</a>)<br>
-    Worked on Gallery Doctor (<a href=\"https://itunes.apple.com/app/id926864471?mt=8\">iOS</a>,<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.doctor&hl=en\">Android</a>) and MyRoll (<a href=\"https://play.google.com/store/apps/details?id=com.flayvr.flayvr&hl=en\">Android</a>)"
-    url: "https://www.myroll.com"
+    description: "Lead iOS Engineer @ MyRoll (Acquired by <a href=\"https://en.wikipedia.org/wiki/AVG_Technologies#:~:text=and%20an%20Israeli-based%20gallery%20app%20company%20called%20MyRoll\">AVG Technologies</a>)<br>
+    Worked on Gallery Doctor (iOS, Android) and MyRoll (Android)"
+    url: "https://en.wikipedia.org/wiki/AVG_Technologies#:~:text=and%20an%20Israeli-based%20gallery%20app%20company%20called%20MyRoll"
   - image: "/img/career/drippler.png"
     date: "2011 - 2013"
-    description: "Lead iOS Engineer @ Drippler<br>
-    Created Drippler's app for <a href=\"https://itunes.apple.com/us/app/drippler-tips-apps-updates/id619307903?mt=8\">iOS</a>"
-    url: "https://www.drippler.com"
+    description: "Lead iOS Engineer @ <a href=\"https://en.wikipedia.org/wiki/Asurion#:~:text=Through%20Soluto%2C%20Asurion%20acquired%20in,phone%20and%20electronics%20repair%20chain.\">Drippler</a> (Acquired by <a href=\"https://en.wikipedia.org/wiki/Asurion#:~:text=Through%20Soluto%2C%20Asurion%20acquired%20in,phone%20and%20electronics%20repair%20chain.\">Asurion</a>)<br>
+    Created Drippler's app for iOS"
+    url: "https://en.wikipedia.org/wiki/Asurion#:~:text=Through%20Soluto%2C%20Asurion%20acquired%20in,phone%20and%20electronics%20repair%20chain."
   - image: "/img/career/bqr.png"
     date: "2007 - 2011"
     description: "Senior Software Engineer @ BQR"
