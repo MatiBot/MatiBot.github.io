@@ -486,6 +486,18 @@ main > .intro {
     transform: scale(1.05);
 }
 
+/* Emoji Drop Animation */
+.emoji-drop {
+    position: fixed;
+    font-size: 30px;
+    pointer-events: none;
+    z-index: 1;
+    user-select: none;
+    will-change: transform, opacity;
+    color: #1a4d7a;
+    text-shadow: 0 0 5px rgba(26, 77, 122, 0.3);
+}
+
 @media(min-width:767px) {
     .intro .img-me {
         width: 150px;

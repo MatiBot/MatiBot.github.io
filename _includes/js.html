@@ -121,3 +121,337 @@
   }());
   </script>
 {% endif %}
+
+<!-- Avatar Click Emoji Effect -->
+<script>
+(function() {
+  // Emojis related to Mati's interests and background
+  var emojis = ['🧠', '📱', '🍎', '🤖', '🧊', '🔭', '💻', '🚀', '🌟', '⚡'];
+  
+  // Black hole variables (will be initialized when DOM is ready)
+  var blackHoleX = 20 + 30; // left + radius
+  var blackHoleY = 0;
+  var blackHoleRadius = 30;
+  var blackHolePullRadius = 200; // Distance at which emojis start getting pulled
+  var cursorNearBlackHole = false;
+  var emojiCount = 0; // Counter for consumed emojis
+  
+  // Create black hole and counter when DOM is ready
+  function createBlackHole() {
+    if (document.body) {
+      // Check if black hole already exists
+      if (!document.getElementById('black-hole')) {
+        // Create black hole at bottom left - make it more visible
+        var blackHole = document.createElement('div');
+        blackHole.id = 'black-hole';
+        blackHole.style.cssText = 'position:fixed;bottom:20px;left:20px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle, #000 0%, #1a1a2e 70%, #2a2a4e 100%);box-shadow:0 0 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.95), 0 0 10px rgba(26,77,122,0.3);z-index:2;pointer-events:none;border:2px solid rgba(26,77,122,0.4);';
+        document.body.appendChild(blackHole);
+      }
+      
+      // Check if counter already exists
+      if (!document.getElementById('black-hole-counter')) {
+        // Create counter above black hole
+        var blackHoleCounter = document.createElement('div');
+        blackHoleCounter.id = 'black-hole-counter';
+        blackHoleCounter.style.cssText = 'position:fixed;bottom:90px;left:20px;width:60px;text-align:center;color:#1a4d7a;font-size:18px;font-weight:bold;z-index:2;pointer-events:none;font-family:Montserrat,sans-serif;text-shadow:0 0 5px rgba(26,77,122,0.5);';
+        blackHoleCounter.textContent = emojiCount.toString();
+        document.body.appendChild(blackHoleCounter);
+        console.log('Black hole counter created with count:', emojiCount);
+      } else {
+        // Update existing counter
+        var existingCounter = document.getElementById('black-hole-counter');
+        existingCounter.textContent = emojiCount.toString();
+      }
+      
+      // Update black hole Y position
+      blackHoleY = window.innerHeight - 20 - 30;
+      
+      // Track cursor position relative to black hole
+      document.addEventListener('mousemove', function(e) {
+        var dx = e.clientX - blackHoleX;
+        var dy = e.clientY - blackHoleY;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        cursorNearBlackHole = distance < blackHolePullRadius;
+      });
+      
+      // Update black hole position on window resize
+      window.addEventListener('resize', function() {
+        blackHoleY = window.innerHeight - 20 - 30;
+        var counter = document.getElementById('black-hole-counter');
+        if (counter) {
+          counter.style.bottom = (window.innerHeight - 20 - 30 + 60) + 'px';
+        }
+      });
+    }
+  }
+  
+  // Initialize black hole when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', createBlackHole);
+  } else {
+    createBlackHole();
+  }
+  
+  // Create emoji drop effect
+  function createEmojiDrop(x, y) {
+    var emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var emojiElement = document.createElement('div');
+    emojiElement.className = 'emoji-drop';
+    emojiElement.textContent = emoji;
+    // Set all styles inline to ensure visibility - behind text, dark blue
+    emojiElement.style.cssText = 'position:fixed;font-size:30px;pointer-events:none;z-index:1;user-select:none;color:#1a4d7a;text-shadow:0 0 5px rgba(26,77,122,0.3);opacity:1;';
+    emojiElement.style.left = x + 'px';
+    emojiElement.style.top = y + 'px';
+    document.body.appendChild(emojiElement);
+    
+    // Random initial velocity
+    var velocityX = (Math.random() - 0.5) * 4;
+    var velocityY = Math.random() * 3 + 2;
+    var rotation = Math.random() * 360;
+    var rotationSpeed = (Math.random() - 0.5) * 10;
+    
+    // Mouse position tracking - get current cursor position
+    var mouseX = 0;
+    var mouseY = 0;
+    var hasCursor = false;
+    
+    // Get current mouse position immediately if available
+    var updateMousePos = function(e) {
+      hasCursor = true;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+    
+    // Track mouse position globally
+    document.addEventListener('mousemove', updateMousePos);
+    
+    // Try to get initial position
+    if (typeof window !== 'undefined') {
+      var getInitialPos = function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        hasCursor = true;
+        document.removeEventListener('mousemove', getInitialPos);
+      };
+      document.addEventListener('mousemove', getInitialPos, { once: true });
+    }
+    
+    var startTime = Date.now();
+    var duration = 60000; // 60 seconds (1 minute)
+    var fallPhaseDuration = 1500; // Fall for 1.5 seconds before circling cursor
+    var orbitRadius = 50 + Math.random() * 30; // Random orbit radius between 50-80px
+    var orbitAngle = Math.random() * Math.PI * 2; // Random starting angle
+    var orbitSpeed = 0.02 + Math.random() * 0.02; // Random orbit speed
+    var orbitDirection = Math.random() > 0.5 ? 1 : -1; // Random direction
+    
+    // Current position for lag effect
+    var currentPosX = x;
+    var currentPosY = y;
+    var lagFactor = 0.15 + Math.random() * 0.1; // Random lag between 0.15-0.25 for variety
+    
+    
+    function animate() {
+      var elapsed = Date.now() - startTime;
+      var progress = elapsed / duration;
+      var fallPhase = elapsed < fallPhaseDuration;
+      
+      if (progress >= 1) {
+        emojiElement.style.opacity = '0';
+        setTimeout(function() {
+          if (emojiElement.parentNode) {
+            document.body.removeChild(emojiElement);
+          }
+          document.removeEventListener('mousemove', updateMousePos);
+          document.removeEventListener('mousemove', updateMousePos);
+        }, 300);
+        return;
+      }
+      
+      var targetX, targetY;
+      
+      if (fallPhase) {
+        // Fall phase - just gravity, completely ignore cursor
+        // Physics: gravity pulls down, initial velocity pushes
+        velocityY += 0.3; // gravity
+        velocityX *= 0.98; // friction
+        velocityY *= 0.98;
+        
+        targetX = currentPosX + velocityX;
+        targetY = currentPosY + velocityY;
+      } else {
+        // After fall phase, check for cursor
+        if (hasCursor) {
+          // Check if cursor is near black hole
+          if (cursorNearBlackHole) {
+            // Pull emoji toward black hole
+            var dx = blackHoleX - currentPosX;
+            var dy = blackHoleY - currentPosY;
+            var distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 5) {
+              // Emoji reached black hole - remove it and increment counter
+              emojiCount++;
+              console.log('Black hole consumed emoji! Count:', emojiCount);
+              
+              // Update counter - try multiple times to ensure it updates
+              function updateCounter() {
+                var counterEl = document.getElementById('black-hole-counter');
+                if (counterEl) {
+                  counterEl.textContent = emojiCount.toString();
+                  console.log('Counter updated to:', emojiCount);
+                  return true;
+                }
+                return false;
+              }
+              
+              // Try to update immediately
+              if (!updateCounter()) {
+                // If not found, try again after a short delay
+                setTimeout(function() {
+                  updateCounter();
+                }, 50);
+              }
+              
+              emojiElement.style.opacity = '0';
+              setTimeout(function() {
+                if (emojiElement.parentNode) {
+                  document.body.removeChild(emojiElement);
+                }
+                document.removeEventListener('mousemove', updateMousePos);
+              }, 100);
+              return;
+            }
+            
+            // Strong pull toward black hole
+            var pullStrength = 0.3;
+            targetX = currentPosX + dx * pullStrength;
+            targetY = currentPosY + dy * pullStrength;
+          } else {
+            // Orbit phase - calculate target orbit position
+            orbitAngle += orbitSpeed * orbitDirection;
+            
+            // Calculate target circular position around cursor
+            targetX = mouseX + Math.cos(orbitAngle) * orbitRadius;
+            targetY = mouseY + Math.sin(orbitAngle) * orbitRadius;
+            
+            // Gradually reduce orbit radius over time for a spiral effect
+            orbitRadius *= 0.9995;
+          }
+        } else {
+          // No cursor - continue falling
+          velocityY += 0.3;
+          velocityX *= 0.98;
+          velocityY *= 0.98;
+          targetX = currentPosX + velocityX;
+          targetY = currentPosY + velocityY;
+        }
+      }
+      
+      // Lag effect - gradually move toward target position (chase effect)
+      currentPosX += (targetX - currentPosX) * lagFactor;
+      currentPosY += (targetY - currentPosY) * lagFactor;
+      
+      // Rotation
+      rotation += rotationSpeed;
+      
+      emojiElement.style.left = currentPosX + 'px';
+      emojiElement.style.top = currentPosY + 'px';
+      emojiElement.style.transform = 'rotate(' + rotation + 'deg)';
+      emojiElement.style.opacity = (1 - progress * 0.8).toString();
+      
+      requestAnimationFrame(animate);
+    }
+    
+    requestAnimationFrame(animate);
+  }
+  
+  // Add click handler to avatar
+  function initAvatarEmoji() {
+    // Try multiple ways to find the avatar
+    var avatarElement = document.getElementById('avatar-link');
+    
+    if (!avatarElement) {
+      // Try finding by the image class
+      var img = document.querySelector('.intro .img-me');
+      if (img) {
+        // Go up to find the container (could be picture or div)
+        avatarElement = img.closest('div') || img.parentElement;
+      }
+    }
+    
+    // Also try finding the picture element
+    if (!avatarElement) {
+      var picture = document.querySelector('.intro picture');
+      if (picture) {
+        avatarElement = picture.parentElement;
+      }
+    }
+    
+    if (avatarElement) {
+      console.log('✅ Avatar emoji effect: Found avatar element');
+      
+      // Check if handler already attached
+      if (avatarElement.dataset.emojiHandlerAttached) {
+        console.log('Handler already attached, skipping');
+        return;
+      }
+      avatarElement.dataset.emojiHandlerAttached = 'true';
+      
+      avatarElement.addEventListener('click', function(e) {
+        console.log('🎯 Avatar clicked!');
+        e.stopPropagation();
+        try {
+          // Find the actual image element
+          var img = this.querySelector('.img-me') || this.querySelector('img');
+          var element = img || this;
+          var rect = element.getBoundingClientRect();
+          var centerX = rect.left + rect.width / 2;
+          var centerY = rect.top + rect.height / 2;
+          
+          console.log('📍 Creating emoji at:', centerX, centerY);
+          
+          // Create only 1 random emoji per click
+          createEmojiDrop(centerX, centerY);
+          console.log('✨ Emoji created!');
+        } catch (err) {
+          console.error('❌ Emoji effect error:', err);
+        }
+      }, false);
+    } else {
+      console.warn('⚠️ Avatar emoji effect: Could not find avatar element');
+      console.log('Available elements:', {
+        avatarLink: document.getElementById('avatar-link'),
+        imgMe: document.querySelector('.intro .img-me'),
+        picture: document.querySelector('.intro picture')
+      });
+    }
+  }
+  
+  // Initialize everything when DOM is ready
+  function initEverything() {
+    createBlackHole();
+    initAvatarEmoji();
+  }
+  
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initEverything);
+  } else {
+    // DOM already ready
+    setTimeout(initEverything, 100);
+  }
+  
+  // Also try on window load as backup
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      if (!document.getElementById('black-hole')) {
+        createBlackHole();
+      }
+      if (!document.getElementById('avatar-link') || !document.querySelector('.intro .img-me')) {
+        // Element not found yet, try again
+        setTimeout(initAvatarEmoji, 200);
+      }
+    }, 100);
+  });
+})();
+</script>

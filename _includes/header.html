@@ -7,9 +7,9 @@
                     <h1 class="brand-heading">&nbsp;</h1>
                     <h1 class="brand-heading">&nbsp;</h1>
                     <p class="intro-text">{{ content }}</p>
-		    <a href="#{{ site.pages_list['About'] }}" class="page-scroll">
-			{% include optimized-image.html src=site.me-img alt="Profile picture" class="img-me" %}
-		    </a>
+		    <div id="avatar-link">
+			{% include optimized-image.html src=site.me-img alt="Profile picture" class="img-me" id="avatar-img" %}
+		    </div>
                 </div>
             </div>
         </div>
