@@ -1,9 +1,19 @@
 /* Custom Timeline Styles */
 
 .career-section {
-    padding: 100px 0;
+    padding: 100px 0 0 0;
     background-color: #000;
     position: relative;
+}
+
+.career-section + .content-section {
+    padding-top: 30px;
+}
+
+@media(min-width:767px) {
+    .career-section + .content-section {
+        padding-top: 40px;
+    }
 }
 
 .career-section h2 {
@@ -104,9 +114,11 @@
     position: relative;
     z-index: 2;
     min-height: 80px;
+    width: 500px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    box-sizing: border-box;
 }
 
 .timeline-card::before {
@@ -189,6 +201,14 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+    .career-section {
+        padding: 60px 0 0 0;
+    }
+    
+    .custom-timeline {
+        padding: 40px 15px 0 15px;
+    }
+    
     .timeline-line {
         left: 35px;
     }
@@ -203,57 +223,109 @@
         height: 70px;
     }
     
+    .timeline-icon::before {
+        width: 76px;
+        height: 76px;
+    }
+    
     .timeline-card {
         margin-left: 60px;
-        padding: 20px;
+        padding: 18px 20px;
         min-height: 70px;
+        width: calc(100% - 60px);
+        max-width: none;
     }
     
     .timeline-date {
         font-size: 12px;
         margin-bottom: 10px;
+        letter-spacing: 1px;
     }
     
     .timeline-text {
         font-size: 14px;
+        line-height: 1.6;
+        word-wrap: break-word;
     }
     
     .timeline-entry.timeline-start .timeline-icon {
+        left: 35px;
         width: 70px;
         height: 70px;
     }
     
     .career-section h2 {
         font-size: 36px;
+        margin-bottom: 40px;
+        padding: 0 20px;
     }
 }
 
 @media (max-width: 480px) {
+    .career-section {
+        padding: 40px 0 0 0;
+    }
+    
     .custom-timeline {
-        padding: 40px 0;
+        padding: 30px 10px 0 10px;
     }
     
     .timeline-line {
-        left: 30px;
+        left: 25px;
+    }
+    
+    .timeline-entry {
+        margin-bottom: 35px;
     }
     
     .timeline-icon {
-        left: 30px;
-        width: 60px;
-        height: 60px;
+        left: 25px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .timeline-icon::before {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .timeline-icon .icon-img {
+        border-width: 3px;
     }
     
     .timeline-card {
-        margin-left: 50px;
-        padding: 15px;
+        margin-left: 40px;
+        padding: 15px 18px;
+        min-height: 60px;
+        width: calc(100% - 40px);
+        max-width: none;
     }
     
     .timeline-date {
-        font-size: 11px;
+        font-size: 10px;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
     }
     
     .timeline-text {
         font-size: 13px;
+        line-height: 1.5;
+    }
+    
+    .timeline-entry.timeline-start {
+        min-height: 50px;
+    }
+    
+    .timeline-entry.timeline-start .timeline-icon {
+        left: 25px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .career-section h2 {
+        font-size: 28px;
+        margin-bottom: 30px;
+        padding: 0 15px;
     }
 }
 
@@ -348,6 +420,41 @@
 
 .bio-interests .bio-section-title {
     margin-bottom: 25px;
+}
+
+.bio-interests-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.bio-interests-list li {
+    margin-bottom: 25px;
+    padding-left: 0;
+    font-size: 18px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.bio-interests-list li:last-child {
+    margin-bottom: 0;
+}
+
+.bio-interests-list li strong {
+    color: #00CDFF;
+    font-weight: 700;
+}
+
+.bio-interests-list li strong a {
+    color: #00CDFF;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s;
+}
+
+.bio-interests-list li strong a:hover {
+    border-bottom-color: #00CDFF;
+    color: #66e0ff;
 }
 
 .bio-future {
