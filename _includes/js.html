@@ -192,6 +192,22 @@
     createBlackHole();
   }
   
+  // Get avatar position for orbit center
+  function getAvatarPosition() {
+    var avatarElement = document.getElementById('avatar-link');
+    if (avatarElement) {
+      var img = avatarElement.querySelector('.img-me') || avatarElement.querySelector('img');
+      if (img) {
+        var rect = img.getBoundingClientRect();
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
+      }
+    }
+    return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  }
+  
   // Create emoji drop effect
   function createEmojiDrop(x, y) {
     var emoji = emojis[Math.floor(Math.random() * emojis.length)];
@@ -204,28 +220,25 @@
     emojiElement.style.top = y + 'px';
     document.body.appendChild(emojiElement);
     
-    // Random initial velocity
-    var velocityX = (Math.random() - 0.5) * 4;
-    var velocityY = Math.random() * 3 + 2;
+    // Rotation
     var rotation = Math.random() * 360;
     var rotationSpeed = (Math.random() - 0.5) * 10;
     
-    // Mouse position tracking - get current cursor position
+    // Mouse position tracking
     var mouseX = 0;
     var mouseY = 0;
     var hasCursor = false;
+    var cursorTrapRadius = 40; // Distance at which cursor "traps" the emoji (very close)
     
-    // Get current mouse position immediately if available
+    // Get current mouse position
     var updateMousePos = function(e) {
       hasCursor = true;
       mouseX = e.clientX;
       mouseY = e.clientY;
     };
-    
-    // Track mouse position globally
     document.addEventListener('mousemove', updateMousePos);
     
-    // Try to get initial position
+    // Try to get initial cursor position
     if (typeof window !== 'undefined') {
       var getInitialPos = function(e) {
         mouseX = e.clientX;
@@ -238,11 +251,19 @@
     
     var startTime = Date.now();
     var duration = 60000; // 60 seconds (1 minute)
-    var fallPhaseDuration = 1500; // Fall for 1.5 seconds before circling cursor
-    var orbitRadius = 50 + Math.random() * 30; // Random orbit radius between 50-80px
+    
+    // Orbit parameters - random radius between two ranges around avatar
+    var range1 = 100 + Math.random() * 50; // 100-150px
+    var range2 = 180 + Math.random() * 50; // 180-230px
+    var orbitRadius = Math.random() > 0.5 ? range1 : range2; // Randomly choose between the two ranges
     var orbitAngle = Math.random() * Math.PI * 2; // Random starting angle
     var orbitSpeed = 0.02 + Math.random() * 0.02; // Random orbit speed
     var orbitDirection = Math.random() > 0.5 ? 1 : -1; // Random direction
+    
+    // Orbit target (starts as avatar, can switch to cursor)
+    var orbitTarget = 'avatar'; // 'avatar' or 'cursor'
+    var avatarPos = getAvatarPosition();
+    var beingSuckedByBlackHole = false; // Track if emoji is being sucked (should continue even if cursor moves)
     
     // Current position for lag effect
     var currentPosX = x;
@@ -253,7 +274,6 @@
     function animate() {
       var elapsed = Date.now() - startTime;
       var progress = elapsed / duration;
-      var fallPhase = elapsed < fallPhaseDuration;
       
       if (progress >= 1) {
         emojiElement.style.opacity = '0';
@@ -262,101 +282,146 @@
             document.body.removeChild(emojiElement);
           }
           document.removeEventListener('mousemove', updateMousePos);
-          document.removeEventListener('mousemove', updateMousePos);
         }, 300);
         return;
       }
       
-      var targetX, targetY;
+      // Update avatar position (in case page scrolls)
+      avatarPos = getAvatarPosition();
       
-      if (fallPhase) {
-        // Fall phase - just gravity, completely ignore cursor
-        // Physics: gravity pulls down, initial velocity pushes
-        velocityY += 0.3; // gravity
-        velocityX *= 0.98; // friction
-        velocityY *= 0.98;
+      // Check if cursor is very close to trap this emoji
+      if (hasCursor && orbitTarget === 'avatar') {
+        var dxToCursor = mouseX - currentPosX;
+        var dyToCursor = mouseY - currentPosY;
+        var distanceToCursor = Math.sqrt(dxToCursor * dxToCursor + dyToCursor * dyToCursor);
         
-        targetX = currentPosX + velocityX;
-        targetY = currentPosY + velocityY;
-      } else {
-        // After fall phase, check for cursor
-        if (hasCursor) {
-          // Check if cursor is near black hole
-          if (cursorNearBlackHole) {
-            // Pull emoji toward black hole
-            var dx = blackHoleX - currentPosX;
-            var dy = blackHoleY - currentPosY;
-            var distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < 5) {
-              // Emoji reached black hole - remove it and increment counter
-              emojiCount++;
-              console.log('Black hole consumed emoji! Count:', emojiCount);
-              
-              // Update counter - try multiple times to ensure it updates
-              function updateCounter() {
-                var counterEl = document.getElementById('black-hole-counter');
-                if (counterEl) {
-                  counterEl.textContent = emojiCount.toString();
-                  console.log('Counter updated to:', emojiCount);
-                  return true;
-                }
-                return false;
-              }
-              
-              // Try to update immediately
-              if (!updateCounter()) {
-                // If not found, try again after a short delay
-                setTimeout(function() {
-                  updateCounter();
-                }, 50);
-              }
-              
-              emojiElement.style.opacity = '0';
-              setTimeout(function() {
-                if (emojiElement.parentNode) {
-                  document.body.removeChild(emojiElement);
-                }
-                document.removeEventListener('mousemove', updateMousePos);
-              }, 100);
-              return;
-            }
-            
-            // Strong pull toward black hole
-            var pullStrength = 0.3;
-            targetX = currentPosX + dx * pullStrength;
-            targetY = currentPosY + dy * pullStrength;
-          } else {
-            // Orbit phase - calculate target orbit position
-            orbitAngle += orbitSpeed * orbitDirection;
-            
-            // Calculate target circular position around cursor
-            targetX = mouseX + Math.cos(orbitAngle) * orbitRadius;
-            targetY = mouseY + Math.sin(orbitAngle) * orbitRadius;
-            
-            // Gradually reduce orbit radius over time for a spiral effect
-            orbitRadius *= 0.9995;
-          }
-        } else {
-          // No cursor - continue falling
-          velocityY += 0.3;
-          velocityX *= 0.98;
-          velocityY *= 0.98;
-          targetX = currentPosX + velocityX;
-          targetY = currentPosY + velocityY;
+        if (distanceToCursor < cursorTrapRadius) {
+          // Cursor is very close - trap the emoji! Switch to cursor orbit
+          orbitTarget = 'cursor';
+          orbitRadius = 50 + Math.random() * 30; // New orbit radius around cursor
+          orbitAngle = Math.atan2(dyToCursor, dxToCursor); // Start from current angle
         }
       }
       
+      // Check if cursor is near black hole - only affect emojis orbiting the cursor
+      // Once being sucked, continue even if cursor moves away
+      if ((hasCursor && cursorNearBlackHole && orbitTarget === 'cursor') || beingSuckedByBlackHole) {
+        // Mark as being sucked if cursor is near black hole
+        if (hasCursor && cursorNearBlackHole && orbitTarget === 'cursor') {
+          beingSuckedByBlackHole = true;
+        }
+        
+        // Position emoji on top of black hole (centered above it)
+        var targetX = blackHoleX;
+        var targetY = blackHoleY - blackHoleRadius - 10; // Position above the black hole
+        
+        // Calculate distance to target position (above black hole)
+        var dx = targetX - currentPosX;
+        var dy = targetY - currentPosY;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Calculate distance to black hole center for scale calculation
+        var dxToCenter = blackHoleX - currentPosX;
+        var dyToCenter = blackHoleY - currentPosY;
+        var distanceToCenter = Math.sqrt(dxToCenter * dxToCenter + dyToCenter * dyToCenter);
+        
+        // Calculate scale based on distance to black hole - smaller as it gets closer
+        var maxPullDistance = blackHolePullRadius; // Use the pull radius as max distance
+        var minScale = 0.2; // Minimum scale when very close (20% of original size)
+        var maxScale = 1.0; // Maximum scale when far away
+        // Scale decreases as distance decreases (closer = smaller)
+        var normalizedDistance = Math.min(1, distanceToCenter / maxPullDistance);
+        var scale = minScale + (maxScale - minScale) * normalizedDistance;
+        
+        // Update rotation
+        rotation += rotationSpeed;
+        emojiElement.style.transform = 'rotate(' + rotation + 'deg) scale(' + scale + ')';
+        
+        // Check if emoji reached the target position above black hole
+        if (distance < 10) {
+          // Emoji reached black hole - remove it and increment counter
+          emojiCount++;
+          console.log('Black hole consumed emoji! Count:', emojiCount);
+          
+          // Update counter immediately - try multiple approaches
+          var counterEl = document.getElementById('black-hole-counter');
+          if (counterEl) {
+            counterEl.textContent = emojiCount.toString();
+            counterEl.innerHTML = emojiCount.toString(); // Also try innerHTML
+            console.log('Counter updated to:', emojiCount);
+          } else {
+            console.warn('Counter element not found! Searching...');
+            // Try to find it again
+            setTimeout(function() {
+              var counterEl2 = document.getElementById('black-hole-counter');
+              if (counterEl2) {
+                counterEl2.textContent = emojiCount.toString();
+                console.log('Counter found and updated to:', emojiCount);
+              } else {
+                console.error('Counter element still not found after delay');
+              }
+            }, 10);
+          }
+          
+          emojiElement.style.opacity = '0';
+          setTimeout(function() {
+            if (emojiElement.parentNode) {
+              document.body.removeChild(emojiElement);
+            }
+            document.removeEventListener('mousemove', updateMousePos);
+          }, 100);
+          return;
+        }
+        
+        // Strong pull toward black hole position
+        var pullStrength = 0.5; // Increased pull strength
+        currentPosX += (targetX - currentPosX) * pullStrength;
+        currentPosY += (targetY - currentPosY) * pullStrength;
+        
+        // Update position immediately
+        emojiElement.style.left = currentPosX + 'px';
+        emojiElement.style.top = currentPosY + 'px';
+        
+        requestAnimationFrame(animate);
+        return;
+      } else {
+        // Orbit phase - calculate target orbit position
+        orbitAngle += orbitSpeed * orbitDirection;
+        
+        // Determine orbit center based on current target
+        var centerX, centerY;
+        if (orbitTarget === 'cursor' && hasCursor) {
+          centerX = mouseX;
+          centerY = mouseY;
+        } else {
+          centerX = avatarPos.x;
+          centerY = avatarPos.y;
+        }
+        
+        // Calculate target circular position around center
+        var targetX = centerX + Math.cos(orbitAngle) * orbitRadius;
+        var targetY = centerY + Math.sin(orbitAngle) * orbitRadius;
+        
+        // Gradually reduce orbit radius over time for a spiral effect
+        orbitRadius *= 0.9995;
+      }
+      
       // Lag effect - gradually move toward target position (chase effect)
-      currentPosX += (targetX - currentPosX) * lagFactor;
-      currentPosY += (targetY - currentPosY) * lagFactor;
+      if (typeof targetX !== 'undefined' && typeof targetY !== 'undefined') {
+        currentPosX += (targetX - currentPosX) * lagFactor;
+        currentPosY += (targetY - currentPosY) * lagFactor;
+      }
       
       // Rotation
       rotation += rotationSpeed;
       
+      // Only update transform if not being sucked by black hole (black hole sets its own transform)
+      if (!(hasCursor && cursorNearBlackHole && orbitTarget === 'cursor')) {
+        emojiElement.style.transform = 'rotate(' + rotation + 'deg)';
+      }
+      
       emojiElement.style.left = currentPosX + 'px';
       emojiElement.style.top = currentPosY + 'px';
-      emojiElement.style.transform = 'rotate(' + rotation + 'deg)';
       emojiElement.style.opacity = (1 - progress * 0.8).toString();
       
       requestAnimationFrame(animate);
