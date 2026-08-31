@@ -627,3 +627,55 @@
         font-size: 18px;
     }
 }
+
+/* Book an Intro CTA */
+
+.book-intro {
+    margin: 10px 0 40px;
+}
+
+.book-intro-btn {
+    display: inline-block;
+    padding: 16px 38px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #00CDFF;
+    background: rgba(0, 205, 255, 0.05);
+    border: 1px solid #00CDFF;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.book-intro-btn:hover,
+.book-intro-btn:focus {
+    color: #000;
+    background: #00CDFF;
+    box-shadow: 0 0 25px rgba(0, 205, 255, 0.35);
+}
+
+.book-intro-btn .fa {
+    margin-right: 8px;
+}
+
+.book-intro-note {
+    margin: 15px 0 0;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+@media (min-width: 767px) {
+    .book-intro-note {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .book-intro-btn {
+        display: block;
+        padding: 16px 20px;
+        letter-spacing: 1px;
+    }
+}
