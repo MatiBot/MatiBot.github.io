@@ -43,9 +43,13 @@ reddit-share: True
 
 events:
   - image: "/img/career/future.png"
-    date: "2025 - Present"
-    description: "Stealth Startup"
+    date: "Jun 2026 - Present"
+    description: "AI Builder @ Stealth AI Startup"
     url: "mailto:hi@mati.bot"
+  - image: "/img/career/succession.png"
+    date: "2026 - Present"
+    description: "AI Consultant @ <a href=\"https://succession.bot/\">succession.bot</a>"
+    url: "https://succession.bot/"
   - image: "/img/career/airbnb.jpg"
     date: "2017 - 2025"
     description: "Staff Software Engineer (2017-2022) & Engineering Manager (2022-2025) @ <a href=\"https://www.airbnb.com/\">Airbnb</a>."
