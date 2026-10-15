@@ -1,206 +1,206 @@
-/* Decision rules use the 23 September proposal and 15 October comparison.
- * Adult and couple premiums use the actual proposal; child costs are unknown.
- * No probabilities, medical eligibility or unquoted prices are estimated.
+/* Plan data and matching rules for the Vienna insurance picker.
+ * Generali: written quotes of 23 Sep 2026 for a 40-year-old office worker insured
+ * with ÖGK in Vienna, including a 5% partner discount for the first three years.
+ * Generali benefit answers: written reply of 8 Oct 2026.
+ * Wiener Städtische: online calculator, age 40, Vienna, ÖGK, checked 15 Oct 2026.
+ * Cigna and Allianz Care: published examples from other countries; benchmarks only.
+ * Doctor bills use the cautious rule: 80% back, up to the plan's yearly limit.
  */
 (function (root) {
   'use strict';
-  const money = n => new Intl.NumberFormat('en-IE', {style:'currency', currency:'EUR', minimumFractionDigits:2, maximumFractionDigits:2}).format(n);
   const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
-  const number = (v, max = 1000000) => Math.max(0, Math.min(max, Number(v) || 0));
-  const defaults = {scope:'adult', priority:'', budget:'', visits:1000, fundedVisits:0, refund:0,
-    partnerVisits:1000,partnerFundedVisits:0,partnerRefund:0,classicQuote:'',premiumQuote:'',
-    region:'vienna', room:'twin', provider:'flexible', reserve:'1500', known:'',
-    edges:[], full:177.22, health:'', hospital:'', outpatient:''};
-  const edges = [
-    {id:'waiting', title:'A long wait for elective surgery', hint:'I want an earlier private option.',
-      benefit:'Hospital cover may fund an eligible private operation, including illness surgery.',
-      gap:'An outpatient policy does not fund an inpatient operation. No appointment date or maximum wait is guaranteed.',
-      next:'Get actual dates from the surgeon and a written hospital cost guarantee before booking.'},
-    {id:'accident', title:'Surgery after an accident', hint:'Is this different from illness?',
-      benefit:'Generali hospital cover includes eligible illness and accident treatment.',
-      gap:'The twin room deductible waiver is for covered accident consequences treated within two years. The separate accident-policy premium is not the price of hospital cover.',
-      next:'Confirm the accident date, treatment link and deductible waiver. Do not replace illness hospital cover with accident-only insurance.'},
-    {id:'dayclinic', title:'Day clinic or outpatient surgery', hint:'An operation without an overnight stay.',
-      benefit:'Qualifying day clinic treatment can fall under the hospital guarantee.',
-      gap:'A separately classified ambulatory operation instead has Generali tariff limits of €650–€3,468 by operation group.',
-      next:'Ask the insurer to classify the exact procedure and confirm the payment amount in writing.'},
-    {id:'implant', title:'A specific surgeon, clinic or costly implant', hint:'I want to choose the provider or prosthesis.',
-      benefit:'Contract hospital treatment can include a direct cost guarantee.',
-      gap:'Noncontract tariffs or excluded surgeon, anaesthesia, facility or implant charges can leave a much larger bill. €1,500 is not a global cap.',
-      next:'Send the complete itemised estimate to the insurer and obtain a guarantee for each charge.'},
-    {id:'checkup', title:'A routine medical check', hint:'Screening while I feel healthy.',
-      benefit:'The standard Austrian preventive check is available through participating providers at public expense.',
-      gap:'Private screening is a separate benefit; Generali prevention has a €205 sublimit, not the full doctor allowance.',
-      next:'Book the public check first. Price optional private screening separately from diagnostic scans for symptoms.'},
-    {id:'medicine', title:'A €100,000 medicine bill ÖGK refuses', hint:'A stress test, not expected yearly spending.',
-      benefit:'Cigna Platinum + outpatient and Allianz Signature + outpatient are candidates for broader eligible prescribed-drug cover.',
-      gap:'Generali’s €415 and Wiener’s €519/€1,038 drug limits leave almost all of this bill unpaid. No international policy is confirmed for this particular scenario.',
-      next:'First establish ÖGK’s approval options. Then request Austrian eligibility, full premiums and written cover for the drug, indication, setting and ongoing renewals.'},
-    {id:'offlabel', title:'Experimental or off-label treatment', hint:'A treatment outside ordinary approval.',
-      benefit:'Only a specific policy coverage decision can establish whether off-label care qualifies.',
-      gap:'Experimental treatment is excluded by the international candidates. Large limits and a hospital admission do not create cover.',
-      next:'Get the exact medicine or procedure and indication assessed before relying on any plan.'},
-    {id:'therapy', title:'Repeated physiotherapy or other claims', hint:'Several types of care in the same year.',
-      benefit:'Prescribed therapy may qualify; Wiener has separate therapy allowances.',
-      gap:'The visit-only cost ranking below excludes these expenses. Generali’s €415 therapy and medicine sublimits sit inside its shared €1,805 annual total; other claims reduce what remains for visits.',
-      next:'Request a combined annual calculation for visits, therapy and medicines before choosing on price.'},
-    {id:'newyear', title:'A hospital stay over New Year', hint:'Two calendar years in one treatment course.',
-      benefit:'The stated hospital deductible has a calendar-year cap.',
-      gap:'A stay across two years can encounter two annual caps. The cap is not automatically per stay.',
-      next:'Confirm how days will be allocated across the two years and budget for that possibility.'},
-    {id:'healthy', title:'A healthy year with no claims', hint:'What if we never use it?',
-      benefit:'Hospital insurance still transfers a future covered private-treatment risk.',
-      gap:'Premiums continue. Generali’s conditional refund is 15% of the eligible outpatient premium (about €81.88 for the first quoted adult); it does not refund the full package.',
-      next:'Check that the annual premium is acceptable even with no claims. Treat any refund as conditional.'},
-    {id:'switching', title:'Premium increases or switching later', hint:'This must work beyond the first year.',
-      benefit:'Buying approved cover now may avoid a fresh health assessment for that same existing contract later.',
-      gap:'The proposal has value adjustment, a 5% family discount for three years and first ordinary cancellation at the end of year three. A new insurer may underwrite you again.',
-      next:'Ask for the price after the discount, adjustment rules and cancellation terms; do not cancel existing cover before new acceptance.'}
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Number(v) || 0));
+  const money = (n, cents) => new Intl.NumberFormat('en-IE', {style:'currency', currency:'EUR',
+    minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0}).format(n);
+  const links = {
+    generali: 'https://www.generali.at/privatkunden/',
+    wiener: 'https://www.wienerstaedtische.at/versicherungen/privatkunden/gesund-fit/online-abschluss-krankenversicherung.html',
+    cigna: 'https://www.cignaglobal.com/',
+    allianz: 'https://www.allianzcare.com/',
+    checkup: 'https://www.gesundheitskasse.at/cdscontent/?contentid=10007.882097'
+  };
+  const GENERALI_SOURCE = 'Real quote · Sep 2026 · age 40';
+  const plans = [
+    {id:'oegk', insurer:'ÖGK', name:'Public cover only', short:'No private plan', cover:'ÖGK + pay doctors yourself', monthly:0, kind:'none', source:'You already pay this through your salary',
+      tagline:'Keep public cover. Pay private doctors yourself when you want one.',
+      doctor:null, hospital:'public',
+      features:{doctor:'You pay; ÖGK refunds a small part', hospital:'General ward, public hospital', medicines:'Most prescriptions (small fee)', therapy:'With a ÖGK referral', travel:'EHIC card in the EU'},
+      covers:['Doctors with an ÖGK contract (Kassenärzte)','Necessary surgery and hospital care in public hospitals','Emergencies, most prescriptions and the free yearly check-up'],
+      gaps:['No private room or choice of hospital doctor','Private doctors (Wahlärzte): you pay most of the bill','Often longer waits for planned operations and specialists'],
+      next:[{text:'Put aside what you expect to spend on private doctors each year. Pay only for the visits you choose.'},
+        {text:'Use the free yearly health check (Vorsorgeuntersuchung).', href:links.checkup, label:'ÖGK health check'}]},
+    {id:'gen-basic', insurer:'Generali', name:'Basic', short:'Generali Basic', cover:'Doctors + hospital cash', monthly:65.38, accident:12.36, kind:'doctor', source:GENERALI_SOURCE,
+      tagline:'Private doctor cover with a little hospital cash.',
+      doctor:{limit:1805}, hospital:'cash',
+      features:{doctor:'€1,805 a year', hospital:'€50 a day in cash, no private room', medicines:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
+      covers:['Private doctors, scans and lab tests: up to €1,805 a year','€50 a day paid to you for each night in hospital','Travel cover for trips up to 6 weeks'],
+      gaps:['No private hospital room','Medicines, physio and psychotherapy: €415 a year each, inside the €1,805','Premiums rose about 6% a year on average'],
+      next:[{text:'Ask Generali for a quote. The price is final only after their health questions.', href:links.generali, label:'Generali'},
+        {text:'For +€7.30 a month, Classic adds a private room after accidents. Worth asking about.'}]},
+    {id:'gen-basic-plus', insurer:'Generali', name:'Basic + bigger doctor limit', short:'Generali Basic+', cover:'Higher doctor limit + hospital cash', monthly:99.64, accident:12.36, kind:'doctor', estimate:true,
+      source:'Estimate · Basic + the 2AJ doctor tier',
+      tagline:'For people who see private doctors a lot.',
+      doctor:{limit:3705, over:.25}, hospital:'cash',
+      features:{doctor:'€3,705 a year, then 25% of fees', hospital:'€50 a day in cash, no private room', medicines:'€685 a year', therapy:'€685 physio, €685 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
+      covers:['Private doctors, scans and lab tests: up to €3,705 a year','After that, still 25% of doctors’ fees','€50 a day paid to you for each night in hospital'],
+      gaps:['Estimated price: Generali quoted this doctor tier (2AJ) for a 43-year-old, +€34.26 a month','No private hospital room','Premiums for this tier rose about 7% a year on average'],
+      next:[{text:'Ask Generali to quote Basic with the higher “2AJ” doctor tier. Generali offered to price higher doctor limits.', href:links.generali, label:'Generali'}]},
+    {id:'gen-classic', insurer:'Generali', name:'Classic', short:'Generali Classic', cover:'Doctors + private room after accidents', monthly:72.68, accident:12.36, kind:'accident', source:GENERALI_SOURCE,
+      tagline:'Doctor cover, plus a private room if you have an accident.',
+      doctor:{limit:1805}, hospital:'accident',
+      features:{doctor:'€1,805 a year', hospital:'Private twin room after accidents; €54 a day in cash for illness', medicines:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
+      covers:['Private twin room after an accident, with no excess to pay','€54 a day paid to you when you’re in hospital for an illness','Private doctors, scans and lab tests: up to €1,805 a year'],
+      gaps:['Illness, e.g. a planned operation, is not private: you get the cash, not the room','Medicines, physio and psychotherapy: €415 a year each','Non-contract hospitals pay only fixed tariff amounts'],
+      next:[{text:'Ask Generali for a quote and the list of contract hospitals.', href:links.generali, label:'Generali'}]},
+    {id:'gen-premium', insurer:'Generali', name:'Premium', short:'Generali Premium', cover:'Doctors + private hospital', monthly:164.86, accident:12.36, kind:'hospital', source:GENERALI_SOURCE,
+      tagline:'Private hospital for illness and accidents, plus doctor cover.',
+      doctor:{limit:1805}, hospital:'full',
+      features:{doctor:'€1,805 a year', hospital:'Private twin room for illness and accidents, anywhere in Austria', medicines:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
+      covers:['Private twin room and your choice of doctor, for illness and accidents','Contract-hospital bills paid in full, doctors’ fees included. No euro limit.','You pay at most €1,500 a year in Vienna (€300 a day, 5 days). Lower Austria and Burgenland: €0.'],
+      gaps:['No guaranteed surgery date','Medicines, physio and psychotherapy: €415 a year each','Non-contract hospitals pay only fixed tariff amounts'],
+      next:[{text:'Ask Generali for a quote, and ask for the version with no excess. They offered both.', href:links.generali, label:'Generali'},
+        {text:'Check that the hospitals and surgeons you would use are Generali contract partners.'}]},
+    {id:'gen-premium-plus', insurer:'Generali', name:'Premium + bigger doctor limit', short:'Generali Premium+', cover:'Higher doctor limit + private hospital', monthly:199.12, accident:12.36, kind:'hospital', estimate:true,
+      source:'Estimate · Premium + the 2AJ doctor tier',
+      tagline:'Private hospital plus a high doctor limit.',
+      doctor:{limit:3705, over:.25}, hospital:'full',
+      features:{doctor:'€3,705 a year, then 25% of fees', hospital:'Private twin room for illness and accidents, anywhere in Austria', medicines:'€685 a year', therapy:'€685 physio, €685 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
+      covers:['Everything in Premium','Private doctors, scans and lab tests: up to €3,705 a year, then 25%','Higher medicine, physio and psychotherapy limits: €685 each'],
+      gaps:['Estimated price: the 2AJ doctor tier costs +€34.26 a month in a quote for a 43-year-old','No guaranteed surgery date','Medicines still capped at €685 a year'],
+      next:[{text:'Ask Generali to quote Premium with the higher “2AJ” doctor tier.', href:links.generali, label:'Generali'},
+        {text:'Check that the hospitals and surgeons you would use are Generali contract partners.'}]},
+    {id:'ws-classic', insurer:'Wiener Städtische', name:'Private doctor Classic', short:'Wiener Städtische Classic', cover:'Doctors only', monthly:128.07, kind:'doctor', source:'Online calculator · Oct 2026 · age 40',
+      tagline:'Higher doctor limit, no hospital cover.',
+      doctor:{limit:3200}, hospital:null,
+      features:{doctor:'€3,200 a year', hospital:null, medicines:'€519 a year', therapy:'€613 a year', travel:null},
+      covers:['Private doctors and scans: up to €3,200 a year','Separate allowances for therapy (€613) and medicines (€519)','Price from the online calculator: easy to check yourself'],
+      gaps:['No hospital cover at all','Dental is excluded','Medicines capped at €519 a year'],
+      next:[{text:'Get your own price in the Wiener Städtische online calculator.', href:links.wiener, label:'Wiener Städtische calculator'}]},
+    {id:'ws-premium', insurer:'Wiener Städtische', name:'Private doctor Premium', short:'Wiener Städtische Premium', cover:'Doctors only', monthly:185.49, kind:'doctor', source:'Online calculator · Oct 2026 · age 40',
+      tagline:'The highest doctor limit here, no hospital cover.',
+      doctor:{limit:6400}, hospital:null,
+      features:{doctor:'€6,400 a year', hospital:null, medicines:'€1,038 a year', therapy:'€1,226 a year', travel:null},
+      covers:['Private doctors and scans: up to €6,400 a year','Separate allowances for therapy (€1,226) and medicines (€1,038)','Price from the online calculator: easy to check yourself'],
+      gaps:['No hospital cover at all','Dental is excluded','Medicines capped at €1,038 a year'],
+      next:[{text:'Get your own price in the Wiener Städtische online calculator.', href:links.wiener, label:'Wiener Städtische calculator'}]},
+    {id:'cigna', insurer:'Cigna Global', name:'Platinum + International Outpatient', monthly:761, kind:'international', benchmark:true,
+      source:'Rough benchmark · published example abroad',
+      tagline:'Worldwide cover with very high limits.',
+      doctor:{limit:Infinity}, hospital:'world',
+      features:{doctor:'No yearly maximum (excess and co-pay apply)', hospital:'Private hospital, worldwide', medicines:'Broad prescription cover; confirm your drug', therapy:'Covered with limits', travel:'Worldwide'},
+      covers:['Hospital, specialists, scans and prescribed medicines, worldwide','No overall yearly maximum on outpatient care','One of the few options for very expensive medicines'],
+      gaps:['Price is a benchmark from another country, not an Austrian quote','Expat eligibility rules apply; excess and co-pays on top','Experimental treatment is excluded'],
+      next:[{text:'Ask Cigna for an Austrian quote: eligibility, excess, maximum yearly co-pay, and written cover for any specific medicine.', href:links.cigna, label:'Cigna Global'}]},
+    {id:'allianz', insurer:'Allianz Care', name:'Signature + outpatient', monthly:null, from:254, kind:'international', benchmark:true,
+      source:'Core plan only · published UK example',
+      tagline:'International cover; outpatient module costs extra.',
+      doctor:{limit:Infinity}, hospital:'world',
+      features:{doctor:'Up to 60 visits a year, combined', hospital:'Private hospital, international', medicines:'Outpatient drugs, no stated cap', therapy:'Within the 60 visits', travel:'International'},
+      covers:['Broad hospital cover','Outpatient prescribed drugs without a stated limit','Excess you choose yourself'],
+      gaps:['Full price unknown: €254–300 a month is the core plan only','Expat eligibility rules apply','Experimental treatment is excluded'],
+      next:[{text:'Ask Allianz Care for an Austrian quote including the outpatient module, and written cover for any specific medicine.', href:links.allianz, label:'Allianz Care'}]}
   ];
+  const byId = id => plans.find(p => p.id === id);
+  const budgets = {b50:50, b100:100, b200:200, any:Infinity};
 
-  function evaluate(input) {
-    const a = {...defaults, ...input};
-    a.edges = Array.isArray(a.edges) ? a.edges.filter(id => edges.some(e => e.id === id)) : [];
-    a.budget = number(a.budget, 10000);
-    a.visits = number(a.visits);
-    a.fundedVisits = number(a.fundedVisits);
-    a.refund = Math.min(number(a.refund), a.fundedVisits);
-    const people=a.scope==='adult'?1:2;
-    a.partnerVisits=number(a.partnerVisits);
-    a.partnerFundedVisits=number(a.partnerFundedVisits);
-    a.partnerRefund=Math.min(number(a.partnerRefund),a.partnerFundedVisits);
-    const pools=[{net:round(a.visits+a.fundedVisits-a.refund),claim:round(.8*a.visits+(a.refund>0?a.fundedVisits-a.refund:.8*a.fundedVisits))}];
-    if(people===2) pools.push({net:round(a.partnerVisits+a.partnerFundedVisits-a.partnerRefund),claim:round(.8*a.partnerVisits+(a.partnerRefund>0?a.partnerFundedVisits-a.partnerRefund:.8*a.partnerFundedVisits))});
-    const net = round(pools.reduce((n,p)=>n+p.net,0));
-    // An ÖGK contribution must apply to each bill in the second pool.
-    // If no refund is entered, that pool uses the 80% no-public-refund rule.
-    const reimbursable = round(pools.reduce((n,p)=>n+p.claim,0));
-    const generaliAllowance=round(pools.reduce((n,p)=>n+Math.min(1805,p.claim,p.net),0));
-    const base = [
-      {id:'self',name:'ÖGK + self pay',monthly:0,limit:0,hospital:false,basis:'No private premium'},
-      {id:'full',name:'Generali full package',monthly:people===1?177.22:364.19,limit:1805,hospital:true,basis:people===1?'Quoted adult proposal; underwriting pending':'Actual two-adult proposal; underwriting pending',extras:true}
-    ];
-    if(people===1||Number(a.classicQuote)>0) base.push({id:'classic',name:'Wiener Classic outpatient',monthly:people===1?128.07:number(a.classicQuote,10000),limit:3200,hospital:false,basis:people===1?'Age 40 price example; personal quote needed':'Two-adult price entered by you; terms must match'});
-    if(people===1||Number(a.premiumQuote)>0) base.push({id:'premium',name:'Wiener Premium outpatient',monthly:people===1?185.49:number(a.premiumQuote,10000),limit:6400,hospital:false,basis:people===1?'Age 40 price example; personal quote needed':'Two-adult price entered by you; terms must match'});
-    for (const [id,name,limit,hospital] of [
-      ['health','Generali hospital + outpatient',1805,true],
-      ['hospital','Generali hospital only + self-paid visits',0,true],
-      ['outpatient','Generali outpatient only',1805,false]
-    ]) {
-      if (a[id] !== '' && Number(a[id]) > 0) base.push({id,name,monthly:number(a[id],10000),limit,hospital,basis:'Revised price entered by you; terms must match'});
-    }
-    const wantsHospital = a.priority === 'hospital' || a.priority === 'both';
-    const medicine = a.priority === 'medicine' || a.edges.includes('medicine');
-    const rows = base.map(p => {
-      // Each person's allowance is separate; unused limits cannot transfer.
-      const paid = round(pools.reduce((sum,person)=>sum+Math.min(p.limit,person.claim,person.net),0));
-      const remaining = round(net-paid), annual = round(p.monthly*12);
-      return {...p,annual,paid,remaining,total:round(annual+remaining),affordable:p.monthly<=a.budget,
-        meetsPriority:!wantsHospital||p.hospital};
-    }).sort((x,y)=>x.total-y.total || x.monthly-y.monthly);
-    const qualifying = rows.filter(p => p.affordable && p.meetsPriority);
-    const candidate = a.priority==='medicine' ? null : a.priority==='budget' ? rows.find(p=>p.id==='self') : (qualifying[0] || null);
-    const self = rows.find(p=>p.id==='self');
-    const cap = a.region==='vienna' ? (a.room==='single'?1855:1500) : a.region==='lower'&&a.room==='twin' ? 0 : null;
-    const years = a.edges.includes('newyear') ? 2 : 1;
-    const reserveNeeded = cap===null?null:cap*years;
-    const reserveKnown = a.reserve !== 'unknown';
-    const reserveMismatch = wantsHospital && (cap===null || !reserveKnown || number(a.reserve)<reserveNeeded);
-    const providerCheck = wantsHospital && (a.provider!=='flexible'||a.edges.includes('implant'));
-    const underwriting = a.known !== 'no';
-    const widerReview = a.edges.includes('therapy') || a.edges.includes('offlabel');
-    let title, status, why;
-    if (a.priority==='medicine') {
-      status='No confirmed fit yet'; title='Get a major-medicine coverage decision first';
-      why='None of the priced local options protects against the stated €100,000 drug bill. Cigna and Allianz need Austrian quotes and a written answer for the specific treatment before either can be ranked.';
-    } else if (underwriting) {
-      status='Coverage decision comes first'; title='Confirm the known issue before choosing a policy';
-      why='A new policy may exclude current symptoms, an existing condition or already-planned treatment. The cost comparison is only for future eligible bills; it does not predict reimbursement for the known issue.';
-    } else if (!candidate && wantsHospital) {
-      status='No priced hospital option within budget'; title='Request a hospital-only quote first';
-      why='The proposed package exceeds your monthly limit, and an unconfirmed component price cannot be treated as an offer. Keep ÖGK and use self pay selectively while obtaining a suitable hospital quote.';
-    } else if (reserveMismatch) {
-      status='Deductible terms need to change or be confirmed'; title='Resolve the hospital deductible before buying';
-      why=cap===null?'We have no verified deductible for this room and province combination. A plan cannot be called a fit until the insurer supplies the applicable terms.':!reserveKnown?'You have not yet set an amount you can comfortably pay when admitted. Confirm the deductible and decide on that reserve first.':`Your chosen hospital setting can require ${money(reserveNeeded)} per person under the stated deductible${years===2?' across two calendar years':''}, above your ${money(number(a.reserve))} per-person reserve. Excluded charges could add more.`;
-    } else if (providerCheck) {
-      status='Provider approval comes first'; title='Check your exact surgeon and hospital';
-      why='The quoted deductible cap applies within the stated hospital cover. It is not a ceiling on noncontract or excluded charges. Obtain an itemised cost guarantee before treating a policy as a fit.';
-    } else {
-      status=a.scope==='family'?'Adult comparison only; children still need quotes':'Best fit to investigate among the priced options';
-      title=candidate.name;
-      if (a.priority==='budget') why='You chose the lowest fixed monthly commitment. ÖGK + self pay has no private premium, though your actual private bills may be higher than with a suitable outpatient policy.';
-      else if (candidate.id==='self') why='For the eligible visits you entered, self pay has the lowest modelled annual cost among options within your budget. Paying for the full Generali package solely to reimburse these visits does not pay off in this example.';
-      else if (wantsHospital) why=`You prioritised funding private hospital treatment. This is the lowest modelled premium-plus-visits total among the entered hospital options within your budget. The hospital benefit covers eligible illness surgery as well as accidents; actual surgery costs and deductibles are additional to this routine-year comparison.`;
-      else why='This has the lowest modelled annual cost for your eligible visits among the compared options within your monthly budget. This is a spending calculation, not a prediction of future claims or an assessment of every insurer on the market.';
-    }
-    const next = [];
-    if (underwriting) next.push('Obtain written underwriting for the existing issue or planned care, including exclusions, waiting periods and any surcharge. Do not book treatment expecting a new policy to pay.');
-    if (candidate?.id==='self'&&!underwriting) next.push('Keep ÖGK and set aside money for the private visits you expect. You can use private appointments while waiting for better-matched quotes.');
-    if (medicine) {
-      next.push('Establish whether ÖGK can approve the medicine, including exceptional reimbursement routes. Identify the drug, indication and outpatient setting.');
-      next.push('Request Cigna Platinum + International Outpatient and Allianz Care Signature + outpatient quotes for Austrian residence: all required modules, deductible, cost sharing maximum, eligibility and written drug coverage.');
-    }
-    if (wantsHospital || a.edges.includes('waiting')) {
-      if (a.hospital==='') next.push(`Ask Generali for an actual hospital-only price. ${people===1?'€117.13':'€242.68'}/month is a component ${people===1?'in the current package':'sum for both adults'}, not a confirmed standalone offer. Request the health-only price too; ${people===1?'€162.62':'€334.05'} is its current component sum.`);
-      next.push('Check the contract hospitals and surgeons you would use, the earliest available dates, room type, deductible and written total cost guarantee.');
-      if (reserveMismatch) next.push(cap===null?'Obtain the deductible for this exact province and room before comparing hospital prices.':`Find terms you can fund: the current scenario may require ${money(reserveNeeded)} in deductibles. Ask about a lower-deductible tariff or a suitable Lower Austria contract twin room; confirm the revised premium.`);
-    }
-    if (a.outpatient==='' && ['routine','both'].includes(a.priority)) next.push(`Request a standalone Generali 1AJ offer. ${people===1?'€45.49':'€91.37'}/month is only the current package component ${people===1?'price':'sum for both adults'}. Add the actual standalone price here if it is offered, including any lost discounts.`);
-    if (candidate && ['classic','premium'].includes(candidate.id)) next.push(`Confirm a personal, underwritten ${candidate.name} offer. ${people===1?'The displayed monthly price is an age 40 calculator example.':'The price entered must cover both adults with the modelled benefits.'} It buys outpatient cover only.`);
-    if (candidate?.id==='full') next.push(`Ask whether travel and accident extras are useful to you and what the price becomes if removed. This comparison charges the entire ${people===1?'€177.22':'€364.19'}/month proposal; it does not count unmodelled travel or accident cash benefits as savings.`);
-    if (widerReview) next.push('Get a combined benefits calculation for the other treatments you selected. These can consume shared limits or fall outside cover; the visit-only ranking is incomplete for those costs.');
-    if (people===2&&(a.classicQuote===''||a.premiumQuote==='')) next.push('Request comparable two-adult Wiener quotes if outpatient cover is relevant. The age 40 example cannot simply be doubled for the second adult. The Generali full-package total of €364.19/month is already known from the two-adult proposal.');
-    if (a.scope==='family') next.push('Obtain a child-inclusive family proposal and accepted terms for each person. The €364.19/month Generali proposal covers the two quoted adults only; no child premium or benefit is included in this model.');
-    if (candidate&&candidate.id!=='self') next.push('Before buying, confirm the final underwritten premium, exclusions, waiting periods, discount expiry and cancellation terms in writing.');
-    if (!next.length) next.push('Keep ÖGK, set aside a private-care budget and pay selectively. Revisit the comparison if expected eligible spending or the value you place on private hospital access changes.');
-    return {answers:a,people,rows,candidate,self,net,reimbursable,generaliAllowance,wantsHospital,medicine,cap,reserveNeeded,underwriting,
-      reserveMismatch,providerCheck,widerReview,title,status,why,next,
-      selectedEdges:edges.filter(e=>a.edges.includes(e.id)),
-      saving:candidate?round(self.total-candidate.total):null};
+  // What the plan pays back on a year of private doctor bills (cautious 80% rule).
+  function doctorPaid(plan, bill) {
+    const d = plan.doctor;
+    bill = clamp(bill, 0, 1e6);
+    if (!d || d.limit === Infinity) return 0;
+    let paid = Math.min(.8 * bill, d.limit);
+    if (d.over && .8 * bill > d.limit) paid += d.over * (bill - d.limit / .8);
+    return round(Math.min(paid, bill));
   }
-  // The short chooser gives a next step, not an invented personalised quote.
-  function quickRecommendation(a) {
-    if (!['hospital','routine','medicine','cost'].includes(a.priority) || !['no','yes','unsure'].includes(a.known)) return null;
-    if (a.priority==='hospital' && !['yes','no','unsure'].includes(a.budget)) return null;
-    if (a.priority==='routine' && !['occasional','frequent','unsure'].includes(a.use)) return null;
-    let r;
-    if (a.priority==='hospital') {
-      const comfortable=a.budget==='yes';
-      r={id:comfortable?'generali':'hospital-quote',
-        title:comfortable?'Consider Generali hospital cover':'Get a hospital-only price first',
-        why:'It can fund eligible private surgery for illness or accidents, when private access matters to you.',
-        cost:'Full proposal for both: €364.19/month (€4,370.28/year). Hospital-only price unconfirmed.',
-        gap:'No guaranteed surgery date. Deductibles and excluded charges can still apply.',
-        next:'Ask the insurance adviser for a hospital-only quote for both adults and confirm the hospitals you would use.'};
-    } else if (a.priority==='routine') {
-      const frequent=a.use==='frequent';
-      r={id:frequent?'outpatient-quotes':'self-routine',
-        title:frequent?'Compare visits-only insurance':'Start with ÖGK + pay per visit',
-        why:frequent?'Frequent eligible visits may justify insurance. The hospital bundle adds a benefit you did not prioritise.':'For occasional visits, the full Generali bundle adds much more cost than it reimburses.',
-        cost:frequent?'Get two-adult quotes: Generali outpatient-only and Wiener Classic / Premium.':'Example: €1,000 of visits each → €2,000 self pay vs €4,770.28 with the full bundle, including premiums.*',
-        gap:frequent?'Visits-only insurance does not fund private inpatient surgery or a €100,000 medicine bill.':'Private surgery and large uncovered medicine bills would still be yours to pay.',
-        next:frequent?'Ask for those quotes and compare reimbursement against each adult’s expected bills.':'Keep ÖGK and pay selectively. If visits become frequent, request an outpatient-only quote.'};
-    } else if (a.priority==='medicine') {
-      r={id:'medicine-quotes',title:'No confirmed plan for this yet',
-        why:'Generali and Wiener’s medicine limits leave most of a €100,000 outpatient drug bill unpaid.',
-        cost:'Cigna Platinum + outpatient or Allianz Signature + outpatient: Austrian prices still needed.',
-        gap:'These are candidates to investigate; neither is confirmed to cover your medicine scenario.',
-        next:'Check ÖGK approval options, then request full quotes and written coverage for the exact drug and condition.'};
-    } else {
-      r={id:'self',title:'Keep ÖGK + pay as needed',
-        why:'This keeps fixed costs down. Use public care and pay privately for selected visits or scans.',
-        cost:'€0 extra private-insurance premium; you pay any private bills yourself.',
-        gap:'You fund private hospital surgery yourself if you choose it. Large uncovered bills remain a risk.',
-        next:'Set aside a care budget. Consider hospital insurance only if private surgery access is worth the recurring cost.'};
-    }
-    if (a.known!=='no') {
-      r={...r,id:'check-existing',title:'Check the known issue first',
-        why:'New insurance may exclude existing symptoms, conditions or planned treatment.',
-        next:'Before buying, disclose the issue and get written confirmation of whether it is covered, excluded or subject to a waiting period.'};
-    }
-    return r;
+  // Premiums plus the part of the doctor bills you still pay.
+  function yearCost(plan, bill) {
+    bill = clamp(bill, 0, 1e6);
+    const premium = round(plan.monthly * 12), paid = doctorPaid(plan, bill), youPay = round(bill - paid);
+    return {premium, paid, youPay, total: round(premium + youPay)};
   }
-  const api = {defaults,edges,evaluate,money,quickRecommendation};
-  if (typeof module !== 'undefined' && module.exports) module.exports=api;
-  else root.InsuranceDecision=api;
-})(typeof window!=='undefined'?window:globalThis);
+  // Yearly doctor bills at which the premiums are paid back. Null when never.
+  function breakEven(plan) {
+    if (!plan.doctor || plan.doctor.limit === Infinity || !plan.monthly) return null;
+    const premium = plan.monthly * 12;
+    if (premium > plan.doctor.limit) return null;
+    return Math.ceil(premium / .8);
+  }
+  function rank(ids, bill, budget) {
+    return ids.map(byId).filter(p => p.monthly <= budget)
+      .map(p => ({plan:p, ...yearCost(p, bill)}))
+      .sort((a, b) => a.total - b.total || a.plan.monthly - b.plan.monthly);
+  }
+
+  const doctorPool = ['oegk', 'gen-basic', 'gen-basic-plus', 'ws-classic', 'ws-premium'];
+  function match(input) {
+    const a = {goal:'', spend:1000, budget:'any', condition:'no', ...input};
+    if (!['hospital','doctor','both','big','unsure'].includes(a.goal)) return null;
+    const bill = clamp(a.spend, 0, 1e6);
+    const budget = budgets[a.budget] ?? Infinity;
+    const self = yearCost(byId('oegk'), bill);
+    let primary, fit = 'match', headline, why, alternatives = [], notes = [];
+    const cheapestDoctor = byId('gen-basic');
+
+    if (a.goal === 'doctor' || a.goal === 'unsure') {
+      const ranked = rank(doctorPool, bill, budget);
+      primary = ranked[0].plan;
+      alternatives = ranked.slice(1, 3).map(r => r.plan);
+      if (primary.id === 'oegk') {
+        headline = 'Skip doctor insurance for now';
+        why = budget < cheapestDoctor.monthly
+          ? `Nothing fits under ${money(budget)} a month. The cheapest doctor cover here is Generali Basic at ${money(cheapestDoctor.monthly, true)}.`
+          : `At about ${money(bill)} a year of private doctor bills, insurance costs more than it pays back. It starts paying off at around ${money(breakEven(cheapestDoctor))} a year.`;
+        if (!alternatives.length) alternatives = [cheapestDoctor];
+      } else {
+        const r = ranked[0];
+        headline = `${primary.insurer} ${primary.name}`;
+        why = `At about ${money(bill)} a year of private doctor bills, this pays back about ${money(r.paid)} for ${money(r.premium)} in premiums. That’s the lowest yearly total among the plans in your budget.`;
+      }
+      if (a.goal === 'unsure') alternatives = [...alternatives.slice(0, 1), byId('gen-premium')];
+    } else if (a.goal === 'hospital' || a.goal === 'both' || a.goal === 'big') {
+      const ranked = rank(a.goal === 'both' ? ['gen-premium', 'gen-premium-plus'] : ['gen-premium'], bill, budget);
+      if (ranked.length) {
+        primary = ranked[0].plan;
+        headline = `${primary.insurer} ${primary.name}`;
+        why = a.goal === 'big'
+          ? 'ÖGK already pays for necessary treatment in public hospitals. If you want a serious illness treated privately, Premium pays contract-hospital bills in full with no euro limit (Generali confirmed this in writing). Your share in Vienna is at most €1,500 a year.'
+          : 'It’s the only plan here with a private twin room for illness as well as accidents. Contract-hospital bills are paid in full, doctors’ fees included.';
+        if (primary.id === 'gen-premium-plus') why += ` With about ${money(bill)} a year of doctor bills, the bigger doctor limit pays for itself.`;
+        alternatives = ranked.slice(1).map(r => r.plan);
+        if (a.goal !== 'big') alternatives.push(byId('gen-classic'));
+      } else if (a.goal === 'big') {
+        primary = byId('oegk'); fit = 'none';
+        headline = 'Public cover already pays big hospital bills';
+        why = 'ÖGK pays for necessary treatment in public hospitals, however expensive it gets. Private hospital cover (Generali Premium, €164.86 a month) buys comfort and choice. It isn’t what stops a huge bill.';
+        alternatives = [byId('gen-premium')];
+      } else if (budget >= byId('gen-classic').monthly) {
+        primary = byId('gen-classic'); fit = 'partial';
+        headline = 'Generali Classic';
+        why = `Full private hospital cover (Generali Premium, ${money(164.86, true)} a month) is above your budget. Classic gets you a private room after accidents, cash for illness stays, and doctor cover.`;
+        alternatives = [byId('gen-premium')];
+      } else {
+        primary = byId('oegk'); fit = 'none';
+        headline = 'Stay with public cover for now';
+        why = 'Private hospital cover starts at €72.68 a month (accidents only) and €164.86 a month (illness too). Public hospitals already cover necessary treatment.';
+        alternatives = [byId('gen-classic'), byId('gen-premium')];
+      }
+      if (a.goal === 'big') {
+        alternatives = [...alternatives.filter(p => p.kind !== 'accident'), byId('cigna'), byId('allianz')];
+        notes.push({tone:'warn', title:'Very expensive medicines are the real gap',
+          text:'Austrian plans cap prescription medicines at €415–€1,038 a year. Generali confirmed the cap applies even to a €100,000 drug that ÖGK won’t pay. Only international plans offer broad drug cover, and only for eligible expats. Ask ÖGK about approval first.'});
+      }
+    }
+    if (a.condition !== 'no') notes.unshift({tone:'warn', title:'About your health condition',
+      text:'Tell the insurer everything before you sign. Treatment that started before the contract is never covered. A condition you declare in writing is covered unless they exclude it in writing. You’ll only see your exclusions and final price after their health check.'});
+    const year = {self: self.total, plan: yearCost(primary, bill)};
+    const next = [...primary.next];
+    if (a.condition !== 'no' && primary.id !== 'oegk') next.unshift({text:'Disclose your condition and get the insurer’s answer in writing before you rely on the policy.'});
+    if (primary.id !== 'oegk') next.push({text:'Don’t cancel any existing cover until the new policy is issued.'});
+    return {answers:a, primary, fit, headline, why, alternatives:alternatives.filter((p, i, l) => p && p.id !== primary.id && l.indexOf(p) === i).slice(0, 3),
+      notes, year, next, saving: round(year.self - year.plan.total)};
+  }
+
+  const api = {plans, byId, budgets, doctorPaid, yearCost, breakEven, match, money, links};
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.InsuranceDecision = api;
+})(typeof window !== 'undefined' ? window : globalThis);

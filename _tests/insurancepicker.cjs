@@ -1,141 +1,93 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {evaluate}=require('../insurancepicker/decision-model.js');
-const baseline={priority:'routine',known:'no',budget:200,visits:1000};
-test('Full bundle never masquerades as a €45.49 outpatient offer',()=>{
-  const r=evaluate(baseline);
-  assert.equal(r.candidate.id,'self');
-  assert.equal(r.rows.find(p=>p.id==='full').total,2326.64);
-  assert.equal(r.rows.find(p=>p.id==='full').annual,2126.64);
-  assert.ok(!r.rows.some(p=>p.id==='outpatient'));
-});
-test('An actual outpatient quote can change the answer',()=>{
-  const r=evaluate({...baseline,outpatient:45.49});
-  assert.equal(r.candidate.id,'outpatient');assert.equal(r.candidate.total,745.88);assert.equal(r.saving,254.12);
-});
-test('Revised quotes use the entered price, not old component figures',()=>{
-  const r=evaluate({...baseline,outpatient:90});
-  assert.equal(r.candidate.id,'self');assert.equal(r.rows.find(p=>p.id==='outpatient').total,1280);
-});
-test('Hospital priority requires hospital cover and the full premium',()=>{
-  const r=evaluate({...baseline,priority:'hospital'});
-  assert.equal(r.candidate.id,'full');assert.equal(r.candidate.monthly,177.22);assert.equal(r.cap,1500);
-});
-test('Hospital budget shortfall produces a quote request, no invented offer',()=>{
-  const r=evaluate({...baseline,priority:'hospital',budget:150});
-  assert.equal(r.candidate,null);assert.match(r.title,/hospital-only quote/);
-});
-test('A hospital-only offer can beat a bundle when routine use is low',()=>{
-  const r=evaluate({...baseline,priority:'both',visits:0,hospital:117.13});
-  assert.equal(r.candidate.id,'hospital');assert.equal(r.candidate.total,1405.56);
-});
-test('Higher outpatient use can favor Premium or Classic within budget',()=>{
-  const r=evaluate({...baseline,visits:5000});
-  assert.equal(r.candidate.id,'premium');assert.equal(r.candidate.total,3225.88);
-  assert.equal(evaluate({...baseline,visits:5000,budget:160}).candidate.id,'classic');
-});
-test('Mixed public refunds are calculated bill-pool by bill-pool',()=>{
-  const r=evaluate({...baseline,outpatient:45.49,visits:1000,fundedVisits:1000,refund:200});
-  const p=r.rows.find(p=>p.id==='outpatient');
-  assert.equal(r.net,1800);assert.equal(p.paid,1600);assert.equal(p.remaining,200);assert.equal(p.total,745.88);
-});
-test('Annual doctor caps still apply after public reimbursement',()=>{
-  const r=evaluate({...baseline,outpatient:45.49,visits:5000,fundedVisits:1000,refund:200});
-  assert.equal(r.rows.find(p=>p.id==='outpatient').paid,1805);
-});
-test('Known care overrides the illustrative price winner',()=>{
-  const r=evaluate({...baseline,outpatient:45.49,known:'yes'});
-  assert.equal(r.underwriting,true);assert.match(r.title,/known issue/);
-  assert.equal(r.candidate.id,'outpatient');
-});
-test('A medicine priority never names a local plan as the answer',()=>{
-  const r=evaluate({...baseline,priority:'medicine'});
-  assert.equal(r.status,'No confirmed fit yet');assert.equal(r.medicine,true);assert.match(r.title,/coverage decision/);assert.equal(r.candidate,null);
-});
-test('Medicine as a secondary concern remains explicitly unresolved',()=>{
-  const r=evaluate({...baseline,edges:['medicine']});
-  assert.equal(r.candidate.id,'self');assert.equal(r.medicine,true);assert.ok(r.next.some(x=>x.includes('Cigna')));
-});
-test('Hospital deductible, room, province and year boundaries matter',()=>{
-  const b={...baseline,priority:'hospital',reserve:'1500'};
-  assert.equal(evaluate({...b,room:'single'}).reserveMismatch,true);
-  assert.equal(evaluate({...b,region:'lower',reserve:'0'}).reserveMismatch,false);
-  assert.equal(evaluate({...b,region:'lower',room:'single'}).cap,null);
-  const ny=evaluate({...b,edges:['newyear']});
-  assert.equal(ny.reserveNeeded,3000);assert.equal(ny.reserveMismatch,true);
-});
-test('A noncontract provider requires written confirmation',()=>{
-  const r=evaluate({...baseline,priority:'hospital',provider:'noncontract'});
-  assert.equal(r.providerCheck,true);assert.match(r.title,/exact surgeon/);
-});
-test('No claims and lowest recurring premium can favor self pay',()=>{
-  assert.equal(evaluate({...baseline,visits:0}).candidate.total,0);
-  assert.equal(evaluate({...baseline,priority:'budget',visits:5000,outpatient:45.49}).candidate.id,'self');
-});
-test('Family scope prices the known adults only and requires child quotes',()=>{
-  const r=evaluate({...baseline,scope:'family'});
-  assert.match(r.status,/children still need quotes/);assert.equal(r.rows.find(p=>p.id==='full').monthly,364.19);
-  assert.ok(r.next.some(x=>x.includes('child-inclusive')));
-});
-test('Therapy flag makes the visit-only ranking explicitly incomplete',()=>{
-  const r=evaluate({...baseline,edges:['therapy']});
-  assert.equal(r.widerReview,true);assert.ok(r.next.some(x=>x.includes('combined benefits')));
-});
-test('Couple mode uses the actual proposal rather than doubling one adult',()=>{
-  const r=evaluate({...baseline,scope:'couple',budget:400,priority:'both'});
-  assert.equal(r.candidate.id,'full');assert.equal(r.candidate.annual,4370.28);
-  assert.equal(r.candidate.paid,1600);assert.equal(r.candidate.total,4770.28);
-  assert.ok(!r.rows.some(p=>p.id==='classic'||p.id==='premium'));
-});
-test('One partner cannot borrow the other partner’s unused allowance',()=>{
-  const r=evaluate({...baseline,scope:'couple',budget:400,visits:10000,partnerVisits:0});
-  assert.equal(r.rows.find(p=>p.id==='full').paid,1805);
-  assert.equal(r.generaliAllowance,1805);
-});
-test('An entered couple quote can rank, using separate per-person limits',()=>{
-  const r=evaluate({...baseline,scope:'couple',budget:400,visits:5000,partnerVisits:5000,classicQuote:265});
-  assert.equal(r.candidate.id,'classic');assert.equal(r.candidate.paid,6400);
-  assert.equal(r.candidate.total,6780);
-});
+const M=require('../insurancepicker/decision-model.js');
+const plan=id=>M.byId(id);
+const base={goal:'doctor',spend:1000,budget:'any',condition:'no'};
 
-const {quickRecommendation:quick}=require('../insurancepicker/decision-model.js');
-test('Short chooser waits for only the relevant answers',()=>{
-  assert.equal(quick({priority:'hospital',known:'no'}),null);
-  assert.equal(quick({priority:'routine',known:'no'}),null);
-  assert.equal(quick({priority:'routine',use:'often',known:'no'}),null);
-  assert.equal(quick({priority:'cost',known:'no'}).id,'self');
-  assert.equal(quick({priority:'medicine',known:'no'}).id,'medicine-quotes');
-  assert.equal(quick({priority:'hospital',budget:'yes'}),null);
+test('Generali prices are the quoted health parts for the 40-year-old adult',()=>{
+  assert.equal(plan('gen-basic').monthly,65.38);
+  assert.equal(plan('gen-classic').monthly,72.68);
+  assert.equal(plan('gen-premium').monthly,164.86);
+  // The full Premium quote, including optional accident insurance, stays €177.22.
+  assert.equal(round(plan('gen-premium').monthly+plan('gen-premium').accident),177.22);
+  assert.ok(plan('gen-basic-plus').estimate && plan('gen-premium-plus').estimate);
 });
-test('Short hospital choices use the actual couple package and never invent a cheaper offer',()=>{
-  for(const budget of ['yes','no','unsure']) {
-    const r=quick({priority:'hospital',budget,known:'no'});
-    assert.equal(r.id,budget==='yes'?'generali':'hospital-quote');
-    assert.match(r.cost,/€364.19\/month/);
-    assert.match(r.cost,/Hospital-only price unconfirmed/);
-    assert.match(r.gap,/No guaranteed surgery date/);
+function round(n){return Math.round(n*100)/100;}
+
+test('Doctor refunds use 80% up to each yearly limit',()=>{
+  assert.equal(M.doctorPaid(plan('gen-basic'),1000),800);
+  assert.equal(M.doctorPaid(plan('gen-basic'),5000),1805);
+  assert.equal(M.doctorPaid(plan('ws-premium'),5000),4000);
+  assert.equal(M.yearCost(plan('ws-premium'),5000).total,3225.88);
+  assert.equal(M.doctorPaid(plan('oegk'),5000),0);
+});
+test('The higher Generali tier pays 25% of fees beyond its limit',()=>{
+  const p=plan('gen-basic-plus');
+  assert.equal(M.doctorPaid(p,4000),3200);
+  assert.equal(M.doctorPaid(p,8000),4547.19);
+});
+test('Break-even bills are honest, and Premium never pays off on doctor bills alone',()=>{
+  assert.equal(M.breakEven(plan('gen-basic')),981);
+  assert.equal(M.breakEven(plan('ws-classic')),1922);
+  assert.equal(M.breakEven(plan('ws-premium')),2783);
+  assert.equal(M.breakEven(plan('gen-premium')),null);
+});
+test('Low doctor spending recommends keeping ÖGK and paying as you go',()=>{
+  const r=M.match({...base,spend:300});
+  assert.equal(r.primary.id,'oegk');assert.match(r.why,/€981/);
+  assert.equal(r.alternatives[0].id,'gen-basic');
+});
+test('Doctor spending picks the cheapest yearly total within budget',()=>{
+  assert.equal(M.match({...base,spend:1500}).primary.id,'gen-basic');
+  assert.equal(M.match({...base,spend:3000,budget:'b100'}).primary.id,'gen-basic-plus');
+  assert.equal(M.match({...base,spend:8000}).primary.id,'ws-premium');
+  assert.equal(M.match({...base,spend:8000,budget:'b100'}).primary.id,'gen-basic-plus');
+  assert.equal(M.match({...base,spend:3000,budget:'b50'}).primary.id,'oegk');
+});
+test('A recommended doctor plan never costs more than paying yourself',()=>{
+  for(const spend of [0,500,1000,1500,2500,4000,6000,8000]) for(const budget of Object.keys(M.budgets)){
+    const r=M.match({...base,spend,budget});
+    assert.ok(r.saving>=0,`${spend} ${budget}`);
   }
 });
-test('Short routine choices separate occasional use from a need for quotes',()=>{
-  assert.equal(quick({priority:'routine',use:'frequent',known:'no'}).id,'outpatient-quotes');
-  for(const use of ['occasional','unsure']) {
-    const r=quick({priority:'routine',use,known:'no'});
-    assert.equal(r.id,'self-routine');
-    assert.match(r.cost,/€2,000 self pay vs €4,770.28/);
-  }
+test('Hospital wishes get Premium, or an honest fallback on smaller budgets',()=>{
+  const h={...base,goal:'hospital'};
+  assert.equal(M.match(h).primary.id,'gen-premium');
+  const mid=M.match({...h,budget:'b100'});
+  assert.equal(mid.primary.id,'gen-classic');assert.equal(mid.fit,'partial');
+  assert.ok(mid.primary.gaps.some(g=>/not private/.test(g)));
+  const low=M.match({...h,budget:'b50'});
+  assert.equal(low.primary.id,'oegk');assert.equal(low.fit,'none');
 });
-test('Known or uncertain conditions take precedence in every short-chooser branch',()=>{
-  for(const priority of ['hospital','routine','medicine','cost']) {
-    for(const known of ['yes','unsure']) {
-      const r=quick({priority,budget:'yes',use:'frequent',known});
-      assert.equal(r.id,'check-existing');
-      assert.match(r.next,/written confirmation/);
-    }
-  }
+test('Both hospital and doctors: the bigger doctor tier wins only with high bills',()=>{
+  assert.equal(M.match({...base,goal:'both',spend:1000}).primary.id,'gen-premium');
+  assert.equal(M.match({...base,goal:'both',spend:4000}).primary.id,'gen-premium-plus');
 });
-test('Medicine short choice never promises catastrophic drug cover or a premium',()=>{
-  const r=quick({priority:'medicine',known:'no'});
-  assert.match(r.title,/No confirmed plan/);
-  assert.match(r.cost,/Austrian prices still needed/);
-  assert.match(r.gap,/neither is confirmed/);
+test('Huge-bill worries flag the medicine gap and point to international plans',()=>{
+  const r=M.match({...base,goal:'big'});
+  assert.equal(r.primary.id,'gen-premium');
+  assert.ok(r.notes.some(n=>/medicines/.test(n.title)));
+  assert.deepEqual(r.alternatives.map(p=>p.id).slice(-2),['cigna','allianz']);
+  const cheap=M.match({...base,goal:'big',budget:'b100'});
+  assert.equal(cheap.primary.id,'oegk');
+  assert.ok(!cheap.alternatives.some(p=>p.id==='gen-classic'));
+});
+test('A known or unsure condition always adds the disclosure warning',()=>{
+  for(const goal of ['hospital','doctor','both','big','unsure']) for(const condition of ['yes','unsure']){
+    const r=M.match({...base,goal,condition});
+    assert.match(r.notes[0].text,/declare it in writing|declare in writing/);
+  }
+  assert.equal(M.match(base).notes.length,0);
+});
+test('Unsure users get a spending answer plus the hospital option',()=>{
+  const r=M.match({...base,goal:'unsure',spend:300});
+  assert.equal(r.primary.id,'oegk');
+  assert.ok(r.alternatives.some(p=>p.id==='gen-premium'));
+});
+test('Benchmarks and estimates are labelled, never presented as quotes',()=>{
+  for(const p of M.plans){
+    if(p.benchmark) assert.match(p.source,/benchmark|example/i);
+    if(p.estimate) assert.match(p.source,/Estimate/);
+  }
+  assert.equal(M.match({goal:'nonsense'}),null);
 });
