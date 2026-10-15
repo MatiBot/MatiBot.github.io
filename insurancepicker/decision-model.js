@@ -158,7 +158,49 @@
       selectedEdges:edges.filter(e=>a.edges.includes(e.id)),
       saving:candidate?round(self.total-candidate.total):null};
   }
-  const api = {defaults,edges,evaluate,money};
+  // The short chooser gives a next step, not an invented personalised quote.
+  function quickRecommendation(a) {
+    if (!['hospital','routine','medicine','cost'].includes(a.priority) || !['no','yes','unsure'].includes(a.known)) return null;
+    if (a.priority==='hospital' && !['yes','no','unsure'].includes(a.budget)) return null;
+    if (a.priority==='routine' && !['occasional','frequent','unsure'].includes(a.use)) return null;
+    let r;
+    if (a.priority==='hospital') {
+      const comfortable=a.budget==='yes';
+      r={id:comfortable?'generali':'hospital-quote',
+        title:comfortable?'Consider Generali hospital cover':'Get a hospital-only price first',
+        why:'It can fund eligible private surgery for illness or accidents, when private access matters to you.',
+        cost:'Full proposal for both: €364.19/month (€4,370.28/year). Hospital-only price unconfirmed.',
+        gap:'No guaranteed surgery date. Deductibles and excluded charges can still apply.',
+        next:'Ask the insurance adviser for a hospital-only quote for both adults and confirm the hospitals you would use.'};
+    } else if (a.priority==='routine') {
+      const frequent=a.use==='frequent';
+      r={id:frequent?'outpatient-quotes':'self-routine',
+        title:frequent?'Compare visits-only insurance':'Start with ÖGK + pay per visit',
+        why:frequent?'Frequent eligible visits may justify insurance. The hospital bundle adds a benefit you did not prioritise.':'For occasional visits, the full Generali bundle adds much more cost than it reimburses.',
+        cost:frequent?'Get two-adult quotes: Generali outpatient-only and Wiener Classic / Premium.':'Example: €1,000 of visits each → €2,000 self pay vs €4,770.28 with the full bundle, including premiums.*',
+        gap:frequent?'Visits-only insurance does not fund private inpatient surgery or a €100,000 medicine bill.':'Private surgery and large uncovered medicine bills would still be yours to pay.',
+        next:frequent?'Ask for those quotes and compare reimbursement against each adult’s expected bills.':'Keep ÖGK and pay selectively. If visits become frequent, request an outpatient-only quote.'};
+    } else if (a.priority==='medicine') {
+      r={id:'medicine-quotes',title:'No confirmed plan for this yet',
+        why:'Generali and Wiener’s medicine limits leave most of a €100,000 outpatient drug bill unpaid.',
+        cost:'Cigna Platinum + outpatient or Allianz Signature + outpatient: Austrian prices still needed.',
+        gap:'These are candidates to investigate; neither is confirmed to cover your medicine scenario.',
+        next:'Check ÖGK approval options, then request full quotes and written coverage for the exact drug and condition.'};
+    } else {
+      r={id:'self',title:'Keep ÖGK + pay as needed',
+        why:'This keeps fixed costs down. Use public care and pay privately for selected visits or scans.',
+        cost:'€0 extra private-insurance premium; you pay any private bills yourself.',
+        gap:'You fund private hospital surgery yourself if you choose it. Large uncovered bills remain a risk.',
+        next:'Set aside a care budget. Consider hospital insurance only if private surgery access is worth the recurring cost.'};
+    }
+    if (a.known!=='no') {
+      r={...r,id:'check-existing',title:'Check the known issue first',
+        why:'New insurance may exclude existing symptoms, conditions or planned treatment.',
+        next:'Before buying, disclose the issue and get written confirmation of whether it is covered, excluded or subject to a waiting period.'};
+    }
+    return r;
+  }
+  const api = {defaults,edges,evaluate,money,quickRecommendation};
   if (typeof module !== 'undefined' && module.exports) module.exports=api;
   else root.InsuranceDecision=api;
 })(typeof window!=='undefined'?window:globalThis);

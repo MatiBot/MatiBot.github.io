@@ -97,3 +97,45 @@ test('An entered couple quote can rank, using separate per-person limits',()=>{
   assert.equal(r.candidate.id,'classic');assert.equal(r.candidate.paid,6400);
   assert.equal(r.candidate.total,6780);
 });
+
+const {quickRecommendation:quick}=require('../insurancepicker/decision-model.js');
+test('Short chooser waits for only the relevant answers',()=>{
+  assert.equal(quick({priority:'hospital',known:'no'}),null);
+  assert.equal(quick({priority:'routine',known:'no'}),null);
+  assert.equal(quick({priority:'routine',use:'often',known:'no'}),null);
+  assert.equal(quick({priority:'cost',known:'no'}).id,'self');
+  assert.equal(quick({priority:'medicine',known:'no'}).id,'medicine-quotes');
+  assert.equal(quick({priority:'hospital',budget:'yes'}),null);
+});
+test('Short hospital choices use the actual couple package and never invent a cheaper offer',()=>{
+  for(const budget of ['yes','no','unsure']) {
+    const r=quick({priority:'hospital',budget,known:'no'});
+    assert.equal(r.id,budget==='yes'?'generali':'hospital-quote');
+    assert.match(r.cost,/€364.19\/month/);
+    assert.match(r.cost,/Hospital-only price unconfirmed/);
+    assert.match(r.gap,/No guaranteed surgery date/);
+  }
+});
+test('Short routine choices separate occasional use from a need for quotes',()=>{
+  assert.equal(quick({priority:'routine',use:'frequent',known:'no'}).id,'outpatient-quotes');
+  for(const use of ['occasional','unsure']) {
+    const r=quick({priority:'routine',use,known:'no'});
+    assert.equal(r.id,'self-routine');
+    assert.match(r.cost,/€2,000 self pay vs €4,770.28/);
+  }
+});
+test('Known or uncertain conditions take precedence in every short-chooser branch',()=>{
+  for(const priority of ['hospital','routine','medicine','cost']) {
+    for(const known of ['yes','unsure']) {
+      const r=quick({priority,budget:'yes',use:'frequent',known});
+      assert.equal(r.id,'check-existing');
+      assert.match(r.next,/written confirmation/);
+    }
+  }
+});
+test('Medicine short choice never promises catastrophic drug cover or a premium',()=>{
+  const r=quick({priority:'medicine',known:'no'});
+  assert.match(r.title,/No confirmed plan/);
+  assert.match(r.cost,/Austrian prices still needed/);
+  assert.match(r.gap,/neither is confirmed/);
+});

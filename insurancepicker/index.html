@@ -14,9 +14,9 @@ permalink: /insurancepicker/
 <title>Insurance picker · mati.bot</title>
 <meta name="description" content="Compare private health insurance premiums, coverage gaps and real-life health scenarios in Austria.">
 <link rel="icon" href="/img/favicon.ico">
-<link rel="stylesheet" href="/insurancepicker/questionnaire.css?v=2">
-<script src="/insurancepicker/decision-model.js?v=2" defer></script>
-<script src="/insurancepicker/questionnaire.js?v=2" defer></script>
+<link rel="stylesheet" href="/insurancepicker/questionnaire.css?v=3">
+<script src="/insurancepicker/decision-model.js?v=3" defer></script>
+<script src="/insurancepicker/questionnaire.js?v=3" defer></script>
 <style>
 :root{color-scheme:light dark;--page:light-dark(#f7f8f5,#131615);--paper:light-dark(#fff,#181818);--ink:light-dark(#1d302d,#e9eeec);--quiet:light-dark(#536760,#b1c0ba);--rule:light-dark(#dbe3dc,#35423d);--accent:light-dark(#1c6553,#8dd7ba);--soft:light-dark(#edf5ed,#22332b)}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:95px}body{margin:0;background:var(--page);color:var(--ink);font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--accent);text-underline-offset:3px}a:hover{text-decoration-thickness:2px}a:focus-visible{outline:2px solid var(--accent);outline-offset:5px}.skip{position:absolute;top:-60px;left:16px;background:var(--paper);padding:8px 16px;z-index:10}.skip:focus{top:8px}
@@ -31,16 +31,14 @@ main{max-width:1088px;padding:28px 36px 0;margin:auto}main>p{max-width:900px}p{m
 <body>
 <a href="#guide" class="skip">Skip to the guide</a>
 <header class="topbar"><a class="brand" href="/">mati.bot</a><span class="edition">AUSTRIA · 15 OCTOBER 2026</span></header>
-<div class="hero"><p class="eyebrow">Insurance picker</p><h1>What is worth insuring?</h1><p class="dek">Start with five questions. Get a shortlist, see the tradeoffs, and know what to check before choosing.</p></div>
-<nav class="jump" aria-label="Guide sections"><div class="jump-inner"><a href="#picker">Start here</a><a href="#premiums">Premiums</a><a href="#scenarios">Try a scenario</a><a href="#coverage">Coverage & gaps</a><a href="#edge-cases">Edge cases</a><a href="#decision">How to decide</a></div></nav>
+<div class="hero"><p class="eyebrow">Insurance picker · for both of us</p><h1>What makes sense for us?</h1><p class="dek">A few taps. One clear next step.</p></div>
 <main id="guide">
 <noscript>The interactive charts need JavaScript. The coverage tables, premium examples and decision guide remain available below.</noscript>
-<p><strong>Decision guide for ÖGK members in Austria · 15 October 2026.</strong> The choice depends on which problem you want insurance to solve: regular private appointments, access to private surgery, or a major treatment bill. These are different benefits, so comparing only the premium or the maximum payout can mislead.</p>
-<div class="bundle-truth" aria-label="Generali full proposal costs"><div><span>Full Generali package · one adult</span><strong>€177.22 / month</strong><small>€2,126.64 / year · hospital, outpatient, travel and accident.</small></div><div><span>Full Generali proposal · both adults</span><strong>€364.19 / month</strong><small>€4,370.28 / year · the actual two-adult proposal, not twice the first adult’s price. Children are not included.</small></div></div>
-<p class="picker-help"><strong>The cheaper numbers are components:</strong> hospital + outpatient total €162.62/month for the first adult, or €334.05 for both. Outpatient alone is a €45.49 component for the first adult (€91.37 combined). Separate prices and availability still need confirmation. The questionnaire uses full-package prices by default; reference charts below remain per adult.</p>
-<section id="picker" aria-labelledby="heading-picker"><div class="section-heading"><span aria-hidden="true">START</span><h2 id="heading-picker">Find the right next step for you</h2></div><p>Answer for your priorities, budget and the care you might need. You’ll get the best fit among the compared options, the gaps it leaves, and the next answers to obtain. If the evidence is incomplete, the result will say so.</p><p class="picker-help">Answers stay in this tab and are not sent to an insurer. Choose one adult or the two-adult proposal; children need separate quotes.</p><div id="insurance-questionnaire"><p>Enable JavaScript to use the questionnaire. The full comparison is below.</p></div></section>
+<section id="picker" aria-labelledby="heading-picker"><h2 id="heading-picker" class="chooser-heading">Start here</h2><div id="insurance-questionnaire"><p>Enable JavaScript for the short chooser, or open the comparison below.</p></div><p class="picker-privacy">For the two adults; children need a separate quote. Answers stay in this tab.</p></section>
+<details id="full-comparison" class="full-comparison"><summary>Prices, coverage &amp; all the edge cases</summary>
+<p class="reference-note">Optional detail. Charts below are per adult; the full Generali proposal for both adults is <strong>€364.19/month (€4,370.28/year)</strong>, including hospital, outpatient, travel and accident cover. Quotes and examples were checked on 15 October 2026.</p>
 <section id="premiums" aria-labelledby="heading-premiums"><div class="section-heading"><span aria-hidden="true">01</span><h2 id="heading-premiums">Premiums before any treatment</h2></div>
-<p><strong>Component prices illustrate how the proposal is made up; they are not confirmed standalone offers.</strong> The questionnaire uses the full Generali package until you enter an actual revised price.</p>
+<p><strong>Component prices illustrate how the proposal is made up; they are not confirmed standalone offers.</strong> The full Generali proposal is €364.19/month for both adults; separate offers still need confirmation.</p>
 <p>All amounts are <strong>per person</strong>, in addition to existing ÖGK contributions. Annual amounts are 12 times the monthly premium, before introductory free months or conditional refunds. Generali amounts are components of the 23 September proposal, pending underwriting; removing components or the family arrangement may change prices. Wiener examples use an anonymous age 40 profile, Vienna, ÖGK, starting 1 November 2026. <a href="https://www.wienerstaedtische.at/versicherungen/privatkunden/gesund-fit/online-abschluss-krankenversicherung.html" rel="noreferrer">Wiener calculator</a>.</p>
 <p>The complete Generali package for you is <strong>€177.22/month (€2,126.64/year)</strong>: hospital €117.13, outpatient €45.49, travel €2.24 and accident €12.36. The comparison below separates hospital and outpatient costs so each benefit can be assessed.</p>
 <div class="visual visual-premiums">
@@ -4856,10 +4854,11 @@ render();
 <li>Ask how they would handle an approved but expensive outpatient medicine refused by ÖGK, including medical necessity, off label use, prior approval and ongoing renewals.</li>
 <li>Choose separately how much you will pay each year for private hospital access and how much routine care you prefer to fund yourself.</li>
 </ul>
-<aside class="recommendation"><p><strong>Provisional choice:</strong> for €1,000 of routine annual visits, self pay beats the full Generali proposal and both Wiener examples. Request an actual outpatient-only quote if routine savings are the goal. If private surgery is the goal, compare the full package against a revised hospital-only offer and the deductible you can fund. The international plans remain an unresolved major-risk decision. <a href="#picker">Use the questionnaire</a> to apply your priorities and edge cases.</p></aside>
+<aside class="recommendation"><p><strong>Provisional choice:</strong> for €1,000 of routine annual visits, self pay beats the full Generali proposal and both Wiener examples. Request an actual outpatient-only quote if routine savings are the goal. If private surgery is the goal, compare the full package against a revised hospital-only offer and the deductible you can fund. The international plans remain an unresolved major-risk decision. <a href="#picker">Use the short chooser</a> to find your next step.</p></aside>
 </section>
+</details>
 </main>
-<footer><p>ÖGK in Austria · Adult and couple questionnaire · Reference charts per adult · 15 October 2026</p><a href="#guide">Back to the guide ↑</a></footer>
+<footer><p>ÖGK in Austria · Prices checked 15 October 2026</p><a href="#guide">Back to the chooser ↑</a></footer>
 </body>
 </html>
 
