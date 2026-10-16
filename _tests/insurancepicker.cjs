@@ -128,3 +128,12 @@ test('PassportCard: real price list, no deductible, medicines without a separate
   assert.equal(c.parts.therapy,2800-912);
   assert.equal(M.rank(worst).winner.plan.id,'passportcard');
 });
+test('Allianz Care: real quote price, but its residency caveat keeps it from winning',()=>{
+  const p=plan('allianz');
+  assert.equal(p.monthly,439);assert.ok(!p.benchmark);assert.match(p.caveat,/not suitable for residents of Austria/);
+  const worst=M.rank(M.usageFrom(M.presets.find(x=>x.id==='worst').levels,'private','illness'));
+  const az=worst.rows.find(r=>r.plan.id==='allianz');
+  assert.ok(az.total<worst.winner.total);
+  assert.notEqual(worst.winner.plan.id,'allianz');
+  for(const pr of M.presets) assert.notEqual(M.rank(M.usageFrom(pr.levels)).winner.plan.id,'allianz');
+});

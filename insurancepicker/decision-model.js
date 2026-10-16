@@ -5,7 +5,9 @@
  * Wiener Städtische: online calculator, age 40, Vienna, ÖGK, checked 15 Oct 2026.
  * PassportCard: official "Global Zone 3" price list (Nov 2024), matching a real quote of Feb 2025;
  * includes the €10 rider that removes the €200 yearly deductible.
- * Cigna and Allianz Care: published examples from other countries; benchmarks only.
+ * Allianz Care: real online quote of 16 Oct 2026 for ages 40 and 43, Signature + Signature
+ *   outpatient, worldwide excl. USA, no deductible: €878 a month for both, paid monthly.
+ * Cigna: a published example from another country; a benchmark only.
  * Outpatient bills: 80% back (the cautious case), within each plan's limits.
  * Hospital bills are examples of a private bill, not price estimates.
  */
@@ -116,11 +118,12 @@
       cells:{doctors:'No yearly maximum', hospital:'Private, worldwide', meds:'Broad cover', therapy:'Covered', travel:'Worldwide', move:'Moves with you', baby:'€11,000 per birth, €22,000 complications · 12-month wait', israel:'Covered · if you’re Israeli: up to 180 days a year', usa:'Emergency hospital stays only, up to 21 days a trip'},
       facts:['🌍 Worldwide, very high limits','💊 Broad cover for expensive medicines','🛂 Expats only: not for citizens of your home country'],
       link:{href:links.cigna, label:'Ask for a quote'}},
-    {id:'allianz', short:'Allianz Care Signature', insurer:'Allianz Care', cover:'International, + outpatient module', monthly:254, priceFloor:true, benchmark:true,
-      source:BENCH, out:{all:true}, hosp:{private:true},
+    {id:'allianz', short:'Allianz Care Signature', insurer:'Allianz Care', cover:'International, with outpatient', monthly:439,
+      source:{type:'quote', label:'Real quote · Oct 2026'}, out:{all:true}, hosp:{private:true},
+      caveat:'Allianz says this cover is for temporary stays and “not suitable for residents of Austria”.',
       meter:{doctors:4, hospital:5, meds:5, therapy:3, travel:5, move:5, baby:4, israel:5, usa:2},
-      cells:{doctors:'60 visits a year', hospital:'Private, international', meds:'No stated cap', therapy:'Inside the 60 visits', travel:'International', move:'Moves with you', baby:'In the core plan · 12-month wait · IVF with outpatient', israel:'Covered in the “excluding USA” area', usa:'Emergencies only, trips up to 6 weeks'},
-      facts:['🌍 International hospital cover','💊 Outpatient drugs with no stated cap','🛂 For people living away from their home country'],
+      cells:{doctors:'60 visits a year', hospital:'Private, international', meds:'No stated cap', therapy:'Inside the 60 visits', travel:'International', move:'Moves with you', baby:'In the core plan · 12-month wait · IVF with outpatient', israel:'Covered in the “excluding USA” area', usa:'Emergencies only; with the USA: ≈ €1,166 a month'},
+      facts:['🌍 Hospital, doctors and medicines, internationally','💊 Outpatient drugs with no stated cap','⚠️ Not for residents of Austria, says Allianz'],
       link:{href:links.allianz, label:'Ask for a quote'}}
   ];
   const byId = id => plans.find(p => p.id === id);
@@ -199,7 +202,8 @@
   // Every plan, cheapest first. The winner must have a real or estimated Austrian price.
   function rank(u) {
     const rows = plans.map(p => yearCost(p, u)).sort((a, b) => a.total - b.total || a.plan.monthly - b.plan.monthly);
-    const winner = rows.find(r => !r.unknown);
+    // A plan whose price is unconfirmed, or whose insurer doubts you qualify, can't win.
+    const winner = rows.find(r => !r.unknown && !r.plan.caveat);
     const none = rows.find(r => r.plan.id === 'oegk');
     return {rows, winner, none, bills:bills(u), saving:round(none.total - winner.total)};
   }

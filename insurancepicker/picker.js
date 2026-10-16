@@ -79,9 +79,10 @@
     const pay = Math.max(0, r.youPay - r.cash);
     const vs = Math.round(r.total - none.total);
     const val = r.unknown ? `${money(r.total)}+<small>${p.priceFloor ? '+ module & co-pays' : '+ co-pays'} ?</small>`
+      : p.caveat ? `${money(r.total)}<small>⚠️ check eligibility</small>`
       : `${money(r.total)}<small class="${vs < 0 ? 'good' : ''}">${isNone ? 'baseline' : vs < 0 ? `${money(-vs)} less` : vs > 0 ? `${money(vs)} more` : 'same'}</small>`;
     return `<button type="button" class="row${isTop ? ' top' : ''}${isNone ? ' none' : ''}" data-id="${p.id}" aria-describedby="tip">
-      <span class="r-rank">${isTop ? e('🏆') : isNone ? e('😬') : rank < 0 ? e('❓') : rank + 1}</span>
+      <span class="r-rank">${isTop ? e('🏆') : isNone ? e('😬') : rank < 0 ? e(r.unknown ? '❓' : '⚠️') : rank + 1}</span>
       <span class="r-name">${esc(p.short)}<small>${esc(sub(r))}</small></span>
       <span class="r-bar" aria-hidden="true">
         <span class="clip"><span class="seg-p" style="width:${r.premium / max * 100}%"></span><span class="seg-y" style="width:${pay / max * 100}%"></span>${r.unknown ? '<span class="seg-q"></span>' : ''}</span>
@@ -105,6 +106,7 @@
       ${line('<i class="k-base"></i>', 'No insurance', money(none.total))}
       <p class="t-verdict ${vs < 0 ? 'good' : ''}">${verdict}</p>
       ${r.unknown ? `<p class="t-small">${unknownNote(p)}</p>` : ''}
+      ${p.caveat ? `<p class="t-small">⚠️ ${esc(p.caveat)}</p>` : ''}
       <a class="t-link" href="#plan-${p.id}" data-goto="${p.id}">See all features ↓</a>`;
   }
   function renderResults() {
@@ -113,7 +115,7 @@
     hideTip(true);
     const w = R.winner, wp = w.plan, none = R.none;
     const max = Math.max(1, ...R.rows.map(r => r.premium + Math.max(0, r.youPay - r.cash)), none.total) * 1.04;
-    const cheaper = R.rows.filter(r => r.unknown && r.total < w.total);
+    const cheaper = R.rows.filter(r => (r.unknown || r.plan.caveat) && r.total < w.total);
     const save = isNoPlan(wp) ? `<strong>€0</strong><span>premiums</span>` : `<strong>${money(R.saving)}</strong><span>less than no insurance</span>`;
     const before = new Map([...results.querySelectorAll('.row')].map(el => [el.dataset.id, el.getBoundingClientRect().top]));
     let n = 0;
@@ -126,13 +128,13 @@
         <ul class="w-facts">${(isNoPlan(wp) ? ['🙌 Insurance doesn’t pay off for this year', ...wp.facts.slice(0, 2)] : wp.facts).map(f => `<li>${esc(f)}</li>`).join('')}</ul>
         <a class="w-link" href="${wp.link.href}" target="_blank" rel="noreferrer">${esc(wp.link.label)} ↗</a></div>
       ${cheaper.length ? `<div class="maybe"><p class="maybe-title">${e('🌍')} Possibly much cheaper, if you qualify</p>
-        <p class="maybe-sub">Not ranked first because their Austrian prices aren’t confirmed yet.</p>
-        <ul>${cheaper.map(r => `<li><span><b>${esc(r.plan.short)}</b>${r.plan.priceFloor ? 'from ' : '≈ '}${money(r.total)} a year + ${r.plan.priceFloor ? 'outpatient module & co-pays' : 'co-pays'}</span><a href="${r.plan.link.href}" target="_blank" rel="noreferrer">Ask for a quote ↗</a></li>`).join('')}</ul></div>` : ''}
+        <p class="maybe-sub">Not ranked first: the price isn’t confirmed, or the insurer doubts you qualify.</p>
+        <ul>${cheaper.map(r => `<li><span><b>${esc(r.plan.short)}</b>${r.unknown ? `≈ ${money(r.total)} a year + co-pays · price not confirmed` : `${money(r.total)} a year · ${esc(r.plan.caveat)}`}</span><a href="${r.plan.link.href}" target="_blank" rel="noreferrer">Ask for a quote ↗</a></li>`).join('')}</ul></div>` : ''}
       ${state.moving ? `<p class="w-note">${e('✈️')} <strong>Moving abroad?</strong> Austrian plans only cover treatment in Austria once you live elsewhere. Generali lets you cancel at the end of the month you move. Cigna and Allianz Care move with you, if you’re eligible.</p>` : ''}
       <div class="rank-head" id="ranking"><h3>All plans for your year</h3>
         <p class="legend"><span><i class="k-prem"></i>Premiums</span><span><i class="k-pay"></i>You pay</span><span><i class="k-base"></i>No insurance</span></p></div>
       <p class="rank-tip">${e('👆')} <span class="hover-only">Hover over</span><span class="touch-only">Tap</span> a plan to see what’s in its bar.</p>
-      <div class="rows">${R.rows.map(r => rowHtml(r, r.unknown ? -1 : n++, max, none, wp.id)).join('')}</div>
+      <div class="rows">${R.rows.map(r => rowHtml(r, r.unknown || r.plan.caveat ? -1 : n++, max, none, wp.id)).join('')}</div>
       <p class="rank-note">Per adult, per year. Plans pay back 80% of outpatient bills within their limits (the cautious case). Hospital and birth bills are examples.</p>`;
     if (!reduceMotion && before.size) {
       results.querySelectorAll('.row').forEach(el => {
@@ -230,7 +232,7 @@
     const winnerId = current.winner.plan.id, noneTotal = current.none.total;
     const rows = sorted().map(p => {
       const r = current.rows.find(x => x.plan.id === p.id);
-      const vs = isNoPlan(p) ? 'baseline' : r.unknown ? '+ co-pays ?' : r.total < noneTotal ? `${money(noneTotal - r.total)} less` : `${money(r.total - noneTotal)} more`;
+      const vs = isNoPlan(p) ? 'baseline' : r.unknown ? '+ co-pays ?' : p.caveat ? '⚠️ check eligibility' : r.total < noneTotal ? `${money(noneTotal - r.total)} less` : `${money(r.total - noneTotal)} more`;
       return `<tr id="plan-${p.id}" class="${p.id === winnerId ? 'win' : ''}">
         <th scope="row">${p.id === winnerId ? '<span class="e cup" aria-label="Cheapest for your year">🏆 </span>' : ''}${esc(p.short)}<small>${esc(p.cover)}</small><a class="q-link" href="${p.link.href}" target="_blank" rel="noreferrer">${esc(p.link.label)} ↗</a></th>
         <td class="year" data-label="🧾 Your year">${money(r.total)}${r.unknown ? '+' : ''}<small>${vs}</small></td>
