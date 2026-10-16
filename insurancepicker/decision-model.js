@@ -43,81 +43,86 @@
 
   const AJ1 = {total:1805, doc:1805, therapy:415, meds:415};
   const AJ2 = {total:3705, doc:3705, therapy:685, meds:685, over:.25};
-  const PREMIUM_HOSPITAL = {private:true, excess:300, excessDays:5, publicCash:130};
+  const PREMIUM_HOSPITAL = {private:true, excess:300, excessDays:5, publicCash:130, birthCash:1517};
   const QUOTE = {type:'quote', label:'Real quote'};
   const ESTIMATE = {type:'estimate', label:'Estimate'};
   const CALC = {type:'calc', label:'Online calculator'};
   const BENCH = {type:'bench', label:'Rough benchmark'};
-  // meter: 0–5 per feature, for the emoji chart. move: what happens if you leave Austria.
+  // meter: 0–5 per feature for the emoji chart; -1 means the insurer doesn't say.
+  // move: what happens if you leave Austria. baby: pregnancy and birth.
   const portable = p => p.meter.move >= 5;
   const plans = [
     {id:'oegk', short:'No private insurance', insurer:'ÖGK only', cover:'€0 premiums · you pay it all', monthly:0,
       source:{type:'none', label:'Paid via salary'}, out:null, hosp:{},
-      meter:{doctors:0, hospital:0, meds:0, therapy:1, travel:1, move:0},
-      cells:{doctors:'You pay it all', hospital:'Public ward', meds:'ÖGK-listed drugs only', therapy:'Some, with a referral', travel:'EHIC card in the EU', move:'Ends: join the new country’s system'},
+      meter:{doctors:0, hospital:0, meds:0, therapy:1, travel:1, move:0, baby:3, israel:0, usa:0},
+      cells:{doctors:'You pay it all', hospital:'Public ward', meds:'ÖGK-listed drugs only', therapy:'Some, with a referral', travel:'EHIC card in the EU', move:'Ends: join the new country’s system', baby:'Free check-ups, public-hospital birth', israel:'Small refund at Austrian rates', usa:'Small refund at Austrian rates'},
       facts:['🏥 Public hospitals cover necessary treatment','🧑‍⚕️ Doctors with an ÖGK contract are free','🆓 Free yearly check-up'],
       link:{href:links.checkup, label:'ÖGK health check'}},
     {id:'gen-basic', short:'Generali Basic', insurer:'Generali', cover:'Doctors + hospital cash', monthly:65.38, accident:12.36,
       source:QUOTE, out:AJ1, hosp:{cash:50},
-      meter:{doctors:2, hospital:1, meds:1, therapy:1, travel:3, move:1},
-      cells:{doctors:'€1,805 a year', hospital:'€50 a day, cash', meds:'€415 a year', therapy:'€415 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      meter:{doctors:2, hospital:1, meds:1, therapy:1, travel:3, move:1, baby:1, israel:2, usa:2},
+      cells:{doctors:'€1,805 a year', hospital:'€50 a day, cash', meds:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad', baby:'€50 a day cash (min. €300) · 9-month wait', israel:'Trips up to 6 weeks, emergencies', usa:'Trips up to 6 weeks, emergencies, max €250k'},
       facts:['🧑‍⚕️ Doctors & tests: up to €1,805 a year','💵 €50 a day in hospital, paid to you','✈️ Travel cover for trips up to 6 weeks'],
       link:{href:links.generali, label:'Get a quote'}},
     {id:'gen-basic-plus', short:'Generali Basic+', insurer:'Generali', cover:'Big doctor limit + hospital cash', monthly:99.64, accident:12.36,
       source:ESTIMATE, out:AJ2, hosp:{cash:50},
-      meter:{doctors:3, hospital:1, meds:2, therapy:2, travel:3, move:1},
-      cells:{doctors:'€3,705, then 25%', hospital:'€50 a day, cash', meds:'€685 a year', therapy:'€685 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      meter:{doctors:3, hospital:1, meds:2, therapy:2, travel:3, move:1, baby:1, israel:2, usa:2},
+      cells:{doctors:'€3,705, then 25%', hospital:'€50 a day, cash', meds:'€685 a year', therapy:'€685 physio, €685 psychotherapy', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad', baby:'€50 a day cash (min. €300) · 9-month wait', israel:'Trips up to 6 weeks, emergencies', usa:'Trips up to 6 weeks, emergencies, max €250k'},
       facts:['🧑‍⚕️ Doctors & tests: up to €3,705 a year, then 25%','💵 €50 a day in hospital, paid to you','🔮 Estimated: Basic + the 2AJ doctor tier'],
       link:{href:links.generali, label:'Ask for this quote'}},
     {id:'gen-classic', short:'Generali Classic', insurer:'Generali', cover:'Doctors + private room after accidents', monthly:72.68, accident:12.36,
       source:QUOTE, out:AJ1, hosp:{cash:54, accidentPrivate:true, accidentCash:160},
-      meter:{doctors:2, hospital:2, meds:1, therapy:1, travel:3, move:1},
-      cells:{doctors:'€1,805 a year', hospital:'Private after accidents, €54/day illness', meds:'€415 a year', therapy:'€415 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      meter:{doctors:2, hospital:2, meds:1, therapy:1, travel:3, move:1, baby:1, israel:2, usa:2},
+      cells:{doctors:'€1,805 a year', hospital:'Private after accidents, €54/day illness', meds:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad', baby:'€54 a day cash (min. €324) · 9-month wait', israel:'Trips up to 6 weeks, emergencies', usa:'Trips up to 6 weeks, emergencies, max €250k'},
       facts:['🚑 Private room after an accident, €0 excess','💵 €54 a day for illness stays','🧑‍⚕️ Doctors & tests: up to €1,805 a year'],
       link:{href:links.generali, label:'Get a quote'}},
     {id:'gen-premium', short:'Generali Premium', insurer:'Generali', cover:'Doctors + private hospital', monthly:164.86, accident:12.36,
       source:QUOTE, out:AJ1, hosp:PREMIUM_HOSPITAL,
-      meter:{doctors:2, hospital:4, meds:1, therapy:1, travel:3, move:1},
-      cells:{doctors:'€1,805 a year', hospital:'Private room, max €1,500/yr excess', meds:'€415 a year', therapy:'€415 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      meter:{doctors:2, hospital:4, meds:1, therapy:1, travel:3, move:1, baby:4, israel:2, usa:2},
+      cells:{doctors:'€1,805 a year', hospital:'Private room, max €1,500/yr excess', meds:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad', baby:'Private-room birth, or €1,517 cash · 9-month wait', israel:'Trips up to 6 weeks, emergencies', usa:'Trips up to 6 weeks, emergencies, max €250k'},
       facts:['🏥 Private room for illness & accidents','🧾 You pay at most €1,500 a year (Vienna)','🧑‍⚕️ Doctors & tests: up to €1,805 a year'],
       link:{href:links.generali, label:'Get a quote'}},
     {id:'gen-premium-plus', short:'Generali Premium+', insurer:'Generali', cover:'Big doctor limit + private hospital', monthly:199.12, accident:12.36,
       source:ESTIMATE, out:AJ2, hosp:PREMIUM_HOSPITAL,
-      meter:{doctors:3, hospital:4, meds:2, therapy:2, travel:3, move:1},
-      cells:{doctors:'€3,705, then 25%', hospital:'Private room, max €1,500/yr excess', meds:'€685 a year', therapy:'€685 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      meter:{doctors:3, hospital:4, meds:2, therapy:2, travel:3, move:1, baby:4, israel:2, usa:2},
+      cells:{doctors:'€3,705, then 25%', hospital:'Private room, max €1,500/yr excess', meds:'€685 a year', therapy:'€685 physio, €685 psychotherapy', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad', baby:'Private-room birth, or €1,517 cash · 9-month wait', israel:'Trips up to 6 weeks, emergencies', usa:'Trips up to 6 weeks, emergencies, max €250k'},
       facts:['🏥 Private room for illness & accidents','🧑‍⚕️ Doctors & tests: up to €3,705 a year, then 25%','🔮 Estimated: Premium + the 2AJ doctor tier'],
       link:{href:links.generali, label:'Ask for this quote'}},
     {id:'ws-classic', short:'Wiener Städtische Classic', insurer:'Wiener Städtische', cover:'Doctors only', monthly:128.07,
       source:CALC, out:{doc:3200, therapy:613, meds:519}, hosp:{},
-      meter:{doctors:3, hospital:0, meds:1, therapy:2, travel:0, move:1},
-      cells:{doctors:'€3,200 a year', hospital:'Not included', meds:'€519 a year', therapy:'€613 a year', travel:'Not included', move:'Austrian plan: check the terms'},
+      meter:{doctors:3, hospital:0, meds:1, therapy:2, travel:-1, move:1, baby:2, israel:-1, usa:-1},
+      cells:{doctors:'€3,200 a year', hospital:'Not included', meds:'€519 a year', therapy:'€613 physio, €519 psychotherapy', travel:'Not stated in their brochure', move:'Austrian plan: check the terms', baby:'Midwife costs + private check-ups', israel:'Not stated in their brochure', usa:'Not stated in their brochure'},
       facts:['🧑‍⚕️ Doctors & tests: up to €3,200 a year','💆 Separate therapy allowance: €613','🚫 No hospital cover'],
       link:{href:links.wiener, label:'Calculate your price'}},
     {id:'ws-premium', short:'Wiener Städtische Premium', insurer:'Wiener Städtische', cover:'Doctors only', monthly:185.49,
       source:CALC, out:{doc:6400, therapy:1226, meds:1038}, hosp:{},
-      meter:{doctors:4, hospital:0, meds:2, therapy:3, travel:0, move:1},
-      cells:{doctors:'€6,400 a year', hospital:'Not included', meds:'€1,038 a year', therapy:'€1,226 a year', travel:'Not included', move:'Austrian plan: check the terms'},
+      meter:{doctors:4, hospital:0, meds:2, therapy:3, travel:-1, move:1, baby:2, israel:-1, usa:-1},
+      cells:{doctors:'€6,400 a year', hospital:'Not included', meds:'€1,038 a year', therapy:'€1,226 physio, €1,038 psychotherapy', travel:'Not stated in their brochure', move:'Austrian plan: check the terms', baby:'Midwife costs + private check-ups', israel:'Not stated in their brochure', usa:'Not stated in their brochure'},
       facts:['🧑‍⚕️ Doctors & tests: up to €6,400 a year','💆 Therapy €1,226, medicines €1,038','🚫 No hospital cover'],
       link:{href:links.wiener, label:'Calculate your price'}},
     {id:'cigna', short:'Cigna Global Platinum', insurer:'Cigna Global', cover:'Worldwide, with outpatient', monthly:761, benchmark:true,
       source:BENCH, out:{all:true}, hosp:{private:true},
-      meter:{doctors:5, hospital:5, meds:5, therapy:4, travel:5, move:5},
-      cells:{doctors:'No yearly maximum', hospital:'Private, worldwide', meds:'Broad cover', therapy:'Covered', travel:'Worldwide', move:'Moves with you'},
-      facts:['🌍 Worldwide, very high limits','💊 Broad cover for expensive medicines','❓ Excess and co-pays not included'],
+      meter:{doctors:5, hospital:5, meds:5, therapy:4, travel:5, move:5, baby:4, israel:5, usa:2},
+      cells:{doctors:'No yearly maximum', hospital:'Private, worldwide', meds:'Broad cover', therapy:'Covered', travel:'Worldwide', move:'Moves with you', baby:'€11,000 per birth, €22,000 complications · 12-month wait', israel:'Covered · if you’re Israeli: up to 180 days a year', usa:'Emergency hospital stays only, up to 21 days a trip'},
+      facts:['🌍 Worldwide, very high limits','💊 Broad cover for expensive medicines','🛂 Expats only: not for citizens of your home country'],
       link:{href:links.cigna, label:'Ask for a quote'}},
     {id:'allianz', short:'Allianz Care Signature', insurer:'Allianz Care', cover:'International, + outpatient module', monthly:254, priceFloor:true, benchmark:true,
       source:BENCH, out:{all:true}, hosp:{private:true},
-      meter:{doctors:4, hospital:5, meds:5, therapy:3, travel:5, move:5},
-      cells:{doctors:'60 visits a year', hospital:'Private, international', meds:'No stated cap', therapy:'Inside the 60 visits', travel:'International', move:'Moves with you'},
-      facts:['🌍 International hospital cover','💊 Outpatient drugs with no stated cap','❓ Core price only: outpatient module costs extra'],
+      meter:{doctors:4, hospital:5, meds:5, therapy:3, travel:5, move:5, baby:4, israel:5, usa:2},
+      cells:{doctors:'60 visits a year', hospital:'Private, international', meds:'No stated cap', therapy:'Inside the 60 visits', travel:'International', move:'Moves with you', baby:'In the core plan · 12-month wait · IVF with outpatient', israel:'Covered in the “excluding USA” area', usa:'Emergencies only, trips up to 6 weeks'},
+      facts:['🌍 International hospital cover','💊 Outpatient drugs with no stated cap','🛂 For people living away from their home country'],
       link:{href:links.allianz, label:'Ask for a quote'}}
   ];
   const byId = id => plans.find(p => p.id === id);
 
-  // Turn level choices into a year of bills.
-  function usageFrom(levels = {}, room = 'private', cause = 'illness') {
+  // Example birth: four nights in hospital. A private-room bill is an example, not a price estimate.
+  const BIRTH = {days:4, privateBill:6000, waitMonths:9};
+  // Turn level choices into a year of bills. baby: 'none', 'public' or 'private'.
+  function usageFrom(levels = {}, room = 'private', cause = 'illness', baby = 'none') {
     const pick = c => c.levels[Math.max(0, Math.min(4, Number(levels[c.key]) || 0))];
-    const u = {privateRoom: room !== 'public', accident: cause === 'accident'};
+    const u = {privateRoom: room !== 'public', accident: cause === 'accident',
+      birth: ['public', 'private'].includes(baby) ? baby : 'none', birthDays: 0, birthBill: 0};
+    if (u.birth !== 'none') { u.birthDays = BIRTH.days; u.birthBill = u.birth === 'private' ? BIRTH.privateBill : 0; }
     for (const c of care) {
       const l = pick(c);
       if (c.key === 'hospital') { u.hospitalBill = l[0]; u.hospitalDays = l[3]; }
@@ -125,47 +130,60 @@
     }
     return u;
   }
-  const bills = u => round(u.visits + u.tests + u.therapy + u.meds + (u.privateRoom ? u.hospitalBill : 0));
+  const bills = u => round(u.visits + u.tests + u.therapy + u.meds + (u.privateRoom ? u.hospitalBill : 0) + u.birthBill);
 
-  // What the plan pays back on outpatient bills.
-  function outpatientPaid(plan, u) {
-    const o = plan.out;
-    const bill = u.visits + u.tests + u.therapy + u.meds;
-    if (!o) return 0;
-    if (o.all) return bill;
-    const docBill = u.visits + u.tests;
-    let doc = Math.min(.8 * docBill, o.doc);
-    const other = Math.min(.8 * u.therapy, o.therapy) + Math.min(.8 * u.meds, o.meds);
-    let paid;
-    if (o.total) { doc = Math.min(doc, o.total); paid = doc + Math.min(other, o.total - doc); }
-    else paid = doc + other;
-    if (o.over && docBill > doc / .8) paid += o.over * (docBill - doc / .8);
-    return round(Math.min(paid, bill));
+  // What the plan pays back on outpatient bills, per kind of care.
+  function outpatientSplit(plan, u) {
+    const o = plan.out, docBill = u.visits + u.tests;
+    if (!o) return {doc:0, therapy:0, meds:0};
+    if (o.all) return {doc:docBill, therapy:u.therapy, meds:u.meds};
+    let doc = Math.min(.8 * docBill, o.doc), therapy = Math.min(.8 * u.therapy, o.therapy), meds = Math.min(.8 * u.meds, o.meds);
+    if (o.total) {
+      // Generali's limits share one yearly total; doctors are paid first.
+      doc = Math.min(doc, o.total);
+      therapy = Math.min(therapy, o.total - doc);
+      meds = Math.min(meds, o.total - doc - therapy);
+    }
+    if (o.over && docBill > doc / .8) doc += o.over * (docBill - doc / .8);
+    return {doc:round(Math.min(doc, docBill)), therapy:round(therapy), meds:round(meds)};
   }
-  // What a hospital stay costs you, and any daily cash the plan pays you.
+  function outpatientPaid(plan, u) {
+    const x = outpatientSplit(plan, u);
+    return round(x.doc + x.therapy + x.meds);
+  }
+  // A hospital stay and a birth: what you pay, what the plan covers, and daily cash paid to you.
+  // Generali Premium's excess counts at most five days per calendar year across all stays.
   function hospitalCost(plan, u) {
-    const d = u.hospitalDays || 0, h = plan.hosp || {};
-    if (!d) return {pay:0, cash:0};
-    let pay = 0, cash = 0;
-    if (u.privateRoom) {
-      pay = u.hospitalBill;
-      if (h.private) pay = u.accident || !h.excess ? 0 : h.excess * Math.min(d, h.excessDays);
-      else if (h.accidentPrivate && u.accident) pay = 0;
-      else if (h.cash) cash = h.cash * d;
-    } else if (h.publicCash) cash = h.publicCash * d;
-    else if (h.accidentCash && u.accident) cash = h.accidentCash * d;
-    else if (h.cash) cash = h.cash * d;
-    return {pay, cash};
+    const h = plan.hosp || {}, d = u.hospitalDays || 0, b = u.birthDays || 0;
+    let pay = 0, cash = 0, covered = 0, excessDays = 0;
+    if (d) {
+      if (u.privateRoom) {
+        if (h.private) { covered += u.hospitalBill; if (!u.accident && h.excess) excessDays += d; }
+        else if (h.accidentPrivate && u.accident) covered += u.hospitalBill;
+        else { pay += u.hospitalBill; if (h.cash) cash += h.cash * d; }
+      } else if (h.publicCash) cash += h.publicCash * d;
+      else if (h.accidentCash && u.accident) cash += h.accidentCash * d;
+      else if (h.cash) cash += h.cash * d;
+    }
+    if (u.birth === 'private') {
+      if (h.private) { covered += u.birthBill; if (h.excess) excessDays += b; }
+      else { pay += u.birthBill; if (h.cash) cash += h.cash * Math.max(b, 6); }
+    } else if (u.birth === 'public') {
+      if (h.birthCash) cash += h.birthCash;
+      else if (h.cash) cash += h.cash * Math.max(b, 6);
+    }
+    if (excessDays) { const ex = h.excess * Math.min(excessDays, h.excessDays); pay += ex; covered -= ex; }
+    return {pay:round(pay), cash:round(cash), covered:round(covered)};
   }
   // A year on this plan: premiums plus what you still pay, minus cash paid to you.
   function yearCost(plan, u) {
     const premium = round(plan.monthly * 12);
-    const outBill = u.visits + u.tests + u.therapy + u.meds;
-    const outPaid = outpatientPaid(plan, u);
-    const h = hospitalCost(plan, u);
-    const youPay = round(outBill - outPaid + h.pay);
-    return {plan, premium, youPay, cash:round(h.cash), total:round(premium + youPay - h.cash),
-      unknown:!!plan.benchmark};
+    const x = outpatientSplit(plan, u), h = hospitalCost(plan, u);
+    const parts = {doctors:round(u.visits + u.tests - x.doc), therapy:round(u.therapy - x.therapy),
+      meds:round(u.meds - x.meds), hospital:h.pay};
+    const youPay = round(parts.doctors + parts.therapy + parts.meds + parts.hospital);
+    return {plan, premium, youPay, parts, cash:h.cash, total:round(premium + youPay - h.cash),
+      insurerPays:round(x.doc + x.therapy + x.meds + h.covered), unknown:!!plan.benchmark};
   }
   // Every plan, cheapest first. The winner must have a real or estimated Austrian price.
   function rank(u) {
@@ -182,7 +200,7 @@
     return premium > o.doc ? null : Math.ceil(premium / .8);
   }
 
-  const api = {care, presets, plans, byId, portable, usageFrom, bills, outpatientPaid, hospitalCost, yearCost, rank, breakEven, money, links};
+  const api = {care, presets, plans, byId, portable, BIRTH, usageFrom, bills, outpatientSplit, outpatientPaid, hospitalCost, yearCost, rank, breakEven, money, links};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.InsuranceDecision = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -89,3 +89,32 @@ test('Estimates and benchmarks are labelled',()=>{
   assert.equal(M.breakEven(plan('gen-basic')),981);
   assert.equal(M.breakEven(plan('gen-premium')),null);
 });
+test('Breakdown: what you pay plus what the insurer pays equals your bills',()=>{
+  for(const p of M.presets) for(const room of ['private','public']) for(const baby of ['none','public','private']){
+    const u=M.usageFrom(p.levels,room,'illness',baby);
+    for(const plan of M.plans){
+      const c=M.yearCost(plan,u);
+      assert.equal(Math.round(c.youPay+c.insurerPays),Math.round(M.bills(u)),`${plan.id} ${p.id} ${room} ${baby}`);
+      assert.equal(Math.round(c.parts.doctors+c.parts.therapy+c.parts.meds+c.parts.hospital),Math.round(c.youPay));
+    }
+  }
+});
+test('Birth: Generali pays cash or covers a private room, and shares Premium’s 5-day excess',()=>{
+  const pub=M.usageFrom({},'private','illness','public');
+  assert.equal(M.bills(pub),0);
+  assert.equal(cost('gen-premium',pub).cash,1517);
+  assert.equal(cost('gen-basic',pub).cash,300);
+  assert.equal(cost('gen-classic',pub).cash,324);
+  const priv=M.usageFrom({},'private','illness','private');
+  assert.equal(cost('oegk',priv).youPay,6000);
+  assert.equal(cost('gen-premium',priv).youPay,1200);
+  // A 3-night stay plus a 4-night birth still caps the excess at 5 days.
+  const both=M.usageFrom({hospital:2},'private','illness','private');
+  assert.equal(cost('gen-premium',both).youPay,1500);
+});
+test('Every plan says something about pregnancy, Israel and the USA',()=>{
+  for(const p of M.plans) for(const k of ['baby','israel','usa']){
+    assert.ok(p.cells[k]&&p.cells[k]!=='Checking',`${p.id} ${k}`);
+    assert.ok(p.meter[k]>=-1&&p.meter[k]<=5);
+  }
+});

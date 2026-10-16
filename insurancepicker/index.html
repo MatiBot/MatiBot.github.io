@@ -16,9 +16,9 @@ permalink: /insurancepicker/
 <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e1311" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/img/favicon.ico">
-<link rel="stylesheet" href="/insurancepicker/picker.css?v=5">
-<script src="/insurancepicker/decision-model.js?v=5" defer></script>
-<script src="/insurancepicker/picker.js?v=5" defer></script>
+<link rel="stylesheet" href="/insurancepicker/picker.css?v=6">
+<script src="/insurancepicker/decision-model.js?v=6" defer></script>
+<script src="/insurancepicker/picker.js?v=6" defer></script>
 </head>
 <body>
 <a href="#picker" class="skip">Skip to the planner</a>
@@ -45,17 +45,8 @@ permalink: /insurancepicker/
 <section id="plans" class="section wrap" aria-labelledby="h-plans">
   <span class="anchor" id="coverage"></span><span class="anchor" id="premiums"></span>
   <div class="section-head"><p class="eyebrow">Every plan at a glance</p><h2 id="h-plans">More emojis, more cover</h2>
-  <p>Five is the most. ❌ means not included.</p></div>
-  <div class="card matrix-wrap"><table class="matrix">
-    <thead><tr><th scope="col">Plan</th><th scope="col"><span class="e" aria-hidden="true">💶</span>Per month</th><th scope="col"><span class="e" aria-hidden="true">🧑‍⚕️</span>Doctors &amp; tests</th><th scope="col"><span class="e" aria-hidden="true">🏥</span>Hospital</th><th scope="col"><span class="e" aria-hidden="true">💊</span>Medicines</th><th scope="col"><span class="e" aria-hidden="true">💆</span>Therapy</th><th scope="col"><span class="e" aria-hidden="true">✈️</span>Travel</th><th scope="col"><span class="e" aria-hidden="true">🧳</span>Move abroad</th></tr></thead>
-    <tbody id="matrix-body">
-      <tr><th scope="row">No private insurance</th><td>€0</td><td colspan="6">You pay private care yourself; ÖGK covers public care.</td></tr>
-      <tr><th scope="row">Generali Basic</th><td>€65.38</td><td colspan="6">Doctors €1,805 a year, €50 a day hospital cash.</td></tr>
-      <tr><th scope="row">Generali Classic</th><td>€72.68</td><td colspan="6">Doctors €1,805 a year, private room after accidents.</td></tr>
-      <tr><th scope="row">Generali Premium</th><td>€164.86</td><td colspan="6">Doctors €1,805 a year, private hospital, max €1,500 a year excess.</td></tr>
-      <tr><th scope="row">Wiener Städtische Classic / Premium</th><td>€128.07 / €185.49</td><td colspan="6">Doctors €3,200 / €6,400 a year, no hospital.</td></tr>
-      <tr><th scope="row">Cigna Global / Allianz Care</th><td>≈ €761 / from €254</td><td colspan="6">International, moves with you. Rough benchmarks.</td></tr>
-    </tbody></table></div>
+  <p>Five is the most. ❌ not included, ❔ not stated. Tap a column to sort.</p></div>
+  <div id="matrix"><noscript><p>Turn on JavaScript for the sortable chart. In short: Generali Basic €65.38, Classic €72.68, Premium €164.86 a month (real quotes, age 40); Wiener Städtische Classic €128.07, Premium €185.49 (online calculator, age 40); Cigna Global ≈ €761 and Allianz Care from €254 (rough benchmarks).</p></noscript></div>
   <p class="matrix-legend"><span>✅ Real quote (age 40)</span><span>🔮 Estimate</span><span>🧮 Online calculator (age 40)</span><span>❓ Rough benchmark</span><span>Per adult, per month</span></p>
 </section>
 
@@ -76,10 +67,12 @@ permalink: /insurancepicker/
     <details><summary>Do I need private insurance at all?</summary><p>No. ÖGK covers contract doctors, emergencies, necessary operations in public hospitals and most prescriptions. Private cover buys comfort, choice and sometimes speed.</p></details>
     <details><summary>How do private doctor bills get paid back?</summary><p>Send the bill to ÖGK first; it refunds a small part. Then send it to your insurer. Generali pays 100% of the rest if ÖGK paid something, 80% if not. We use 80% to be safe.</p></details>
     <details><summary>What if we move out of Austria?</summary><p>Generali covers treatment abroad only while Austria is your home (more than 6 months a year). After you move, it covers Austria only, and you can cancel at the end of the month you move. Ask about a standby policy (Anwartschaft) if you might come back. ÖGK ends and you join your new country’s system. Cigna and Allianz Care are built to move with you; the price can change.</p></details>
+    <details><summary>What about pregnancy and having a baby?</summary><p>ÖGK already covers the Mutter-Kind-Pass check-ups and a birth in a public hospital. Private plans only pay if the pregnancy starts after their waiting period: 9 months at Generali. Generali Premium covers a private-room birth (the €300-a-day Vienna excess applies), or pays €1,517 cash if you use the public ward. Basic and Classic pay daily cash for at least 6 days. Wiener Städtische covers midwife costs. Cigna and Allianz Care include maternity in the core plan after a 12-month wait; Cigna Platinum pays up to €11,000 per birth and €22,000 for complications.</p></details>
+    <details><summary>Do the plans work in Israel and the USA?</summary><p>Generali’s travel cover pays for emergencies on trips up to 6 weeks anywhere in the world, USA included, up to €250,000. It doesn’t cover planned treatment or living there. Cigna and Allianz Care cover Israel in their cheaper “worldwide excluding USA” area. In the USA that area only pays emergencies on trips (Cigna: emergency hospital stays up to 21 days; Allianz Care: emergency treatment on trips up to 6 weeks), unless you pay for the pricier worldwide area. Both are for expats: Cigna doesn’t sell its EU plan to citizens of the country they live in, and covers your country of citizenship for up to 180 days a year. ÖGK only refunds a small amount at Austrian rates outside the EU.</p></details>
     <details><summary>What about existing health conditions?</summary><p>Declare everything. Treatment that started before the contract is never covered. A condition you declared is covered unless the insurer excludes it in writing.</p></details>
     <details><summary>Does private cover get me surgery faster?</summary><p>It can help, but no insurer guarantees a date. Ask the surgeon for real dates first.</p></details>
     <details><summary>Will my premium go up?</summary><p>Probably. Generali’s tariffs rose 1–7% a year on average over the last five years, and the 5% partner discount ends after year three.</p></details>
-    <details><summary>Where do the prices come from?</summary><p>Generali: real quotes (23 Sep 2026) for a 40-year-old in Vienna and written answers (8 Oct 2026). Wiener Städtische: online calculator, age 40. Cigna and Allianz Care: published examples from other countries. Your price depends on your age and health.</p></details>
+    <details><summary>Where do the prices come from?</summary><p>Generali: real quotes (23 Sep 2026) for a 40-year-old in Vienna and written answers (8 Oct 2026). Wiener Städtische: online calculator, age 40. Cigna and Allianz Care: published examples from other countries; their cover details come from their 2025–2026 benefit documents. Your price depends on your age and health.</p></details>
   </div>
 </section>
 
