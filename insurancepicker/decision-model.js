@@ -1,15 +1,15 @@
-/* Plan data and matching rules for the Vienna insurance picker.
+/* Plan data and yearly-cost model for the Vienna insurance picker.
  * Generali: written quotes of 23 Sep 2026 for a 40-year-old office worker insured
- * with ÖGK in Vienna, including a 5% partner discount for the first three years.
- * Generali benefit answers: written reply of 8 Oct 2026.
+ * with ÖGK in Vienna, including a 5% partner discount for the first three years,
+ * and Generali's written answers of 8 Oct 2026.
  * Wiener Städtische: online calculator, age 40, Vienna, ÖGK, checked 15 Oct 2026.
  * Cigna and Allianz Care: published examples from other countries; benchmarks only.
- * Doctor bills use the cautious rule: 80% back, up to the plan's yearly limit.
+ * Outpatient bills: 80% back (the cautious case), within each plan's limits.
+ * Hospital bills are examples of a private bill, not price estimates.
  */
 (function (root) {
   'use strict';
   const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Number(v) || 0));
   const money = (n, cents) => new Intl.NumberFormat('en-IE', {style:'currency', currency:'EUR',
     minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0}).format(n);
   const links = {
@@ -19,188 +19,170 @@
     allianz: 'https://www.allianzcare.com/',
     checkup: 'https://www.gesundheitskasse.at/cdscontent/?contentid=10007.882097'
   };
-  const GENERALI_SOURCE = 'Real quote · Sep 2026 · age 40';
+
+  // Five levels per kind of care: [amount in €, emoji, label]. Hospital adds days.
+  const care = [
+    {key:'visits', emoji:'🧑‍⚕️', name:'Private doctor visits', hint:'≈ €150 a visit', levels:[
+      [0,'😎','None'], [300,'🙂','2 visits'], [750,'🤔','5 visits'], [1500,'🤧','10 visits'], [3000,'🤒','20 visits']]},
+    {key:'tests', emoji:'🔬', name:'Scans & lab tests', hint:'Private, per year', levels:[
+      [0,'🙅','None'], [150,'🩸','Blood test'], [400,'🔍','Ultrasound + bloods'], [1000,'🧲','MRI + more'], [2500,'🧬','Lots of tests']]},
+    {key:'therapy', emoji:'💆', name:'Physio & therapy', hint:'≈ €70 a session', levels:[
+      [0,'🙅','None'], [350,'💆','5 sessions'], [700,'🧘','10 sessions'], [1400,'🏋️','20 sessions'], [2800,'🦿','40 sessions']]},
+    {key:'meds', emoji:'💊', name:'Medicines ÖGK won’t pay', hint:'Per year', levels:[
+      [0,'🙅','None'], [100,'💊','A little'], [500,'💉','Regular'], [2000,'🧪','Pricey'], [100000,'💀','Nightmare drug']]},
+    {key:'hospital', emoji:'🏥', name:'Hospital stay', hint:'Example private bill', levels:[
+      [0,'😌','None',0], [5000,'✂️','Day surgery',1], [15000,'🛏️','Op + 3 nights',3], [30000,'🩻','Big op, 1 week',7], [100000,'🚑','Serious, 3 weeks',21]]}
+  ];
+  const presets = [
+    {id:'healthy', emoji:'😎', name:'Healthy', levels:{visits:0, tests:0, therapy:0, meds:0, hospital:0}},
+    {id:'normal', emoji:'🙂', name:'Normal', levels:{visits:1, tests:1, therapy:0, meds:1, hospital:0}},
+    {id:'busy', emoji:'🤧', name:'Busy', levels:{visits:2, tests:2, therapy:2, meds:2, hospital:0}},
+    {id:'rough', emoji:'🩹', name:'Rough', levels:{visits:3, tests:3, therapy:3, meds:2, hospital:2}},
+    {id:'worst', emoji:'😱', name:'Worst case', levels:{visits:4, tests:4, therapy:4, meds:4, hospital:4}}
+  ];
+
+  const AJ1 = {total:1805, doc:1805, therapy:415, meds:415};
+  const AJ2 = {total:3705, doc:3705, therapy:685, meds:685, over:.25};
+  const PREMIUM_HOSPITAL = {private:true, excess:300, excessDays:5, publicCash:130};
+  const QUOTE = {type:'quote', label:'Real quote'};
+  const ESTIMATE = {type:'estimate', label:'Estimate'};
+  const CALC = {type:'calc', label:'Online calculator'};
+  const BENCH = {type:'bench', label:'Rough benchmark'};
+  // meter: 0–5 per feature, for the emoji chart. move: what happens if you leave Austria.
+  const portable = p => p.meter.move >= 5;
   const plans = [
-    {id:'oegk', insurer:'ÖGK', name:'Public cover only', short:'No private plan', cover:'ÖGK + pay doctors yourself', monthly:0, kind:'none', source:'You already pay this through your salary',
-      tagline:'Keep public cover. Pay private doctors yourself when you want one.',
-      doctor:null, hospital:'public',
-      features:{doctor:'You pay; ÖGK refunds a small part', hospital:'General ward, public hospital', medicines:'Most prescriptions (small fee)', therapy:'With a ÖGK referral', travel:'EHIC card in the EU'},
-      covers:['Doctors with an ÖGK contract (Kassenärzte)','Necessary surgery and hospital care in public hospitals','Emergencies, most prescriptions and the free yearly check-up'],
-      gaps:['No private room or choice of hospital doctor','Private doctors (Wahlärzte): you pay most of the bill','Often longer waits for planned operations and specialists'],
-      next:[{text:'Put aside what you expect to spend on private doctors each year. Pay only for the visits you choose.'},
-        {text:'Use the free yearly health check (Vorsorgeuntersuchung).', href:links.checkup, label:'ÖGK health check'}]},
-    {id:'gen-basic', insurer:'Generali', name:'Basic', short:'Generali Basic', cover:'Doctors + hospital cash', monthly:65.38, accident:12.36, kind:'doctor', source:GENERALI_SOURCE,
-      tagline:'Private doctor cover with a little hospital cash.',
-      doctor:{limit:1805}, hospital:'cash',
-      features:{doctor:'€1,805 a year', hospital:'€50 a day in cash, no private room', medicines:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
-      covers:['Private doctors, scans and lab tests: up to €1,805 a year','€50 a day paid to you for each night in hospital','Travel cover for trips up to 6 weeks'],
-      gaps:['No private hospital room','Medicines, physio and psychotherapy: €415 a year each, inside the €1,805','Premiums rose about 6% a year on average'],
-      next:[{text:'Ask Generali for a quote. The price is final only after their health questions.', href:links.generali, label:'Generali'},
-        {text:'For +€7.30 a month, Classic adds a private room after accidents. Worth asking about.'}]},
-    {id:'gen-basic-plus', insurer:'Generali', name:'Basic + bigger doctor limit', short:'Generali Basic+', cover:'Higher doctor limit + hospital cash', monthly:99.64, accident:12.36, kind:'doctor', estimate:true,
-      source:'Estimate · Basic + the 2AJ doctor tier',
-      tagline:'For people who see private doctors a lot.',
-      doctor:{limit:3705, over:.25}, hospital:'cash',
-      features:{doctor:'€3,705 a year, then 25% of fees', hospital:'€50 a day in cash, no private room', medicines:'€685 a year', therapy:'€685 physio, €685 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
-      covers:['Private doctors, scans and lab tests: up to €3,705 a year','After that, still 25% of doctors’ fees','€50 a day paid to you for each night in hospital'],
-      gaps:['Estimated price: Generali quoted this doctor tier (2AJ) for a 43-year-old, +€34.26 a month','No private hospital room','Premiums for this tier rose about 7% a year on average'],
-      next:[{text:'Ask Generali to quote Basic with the higher “2AJ” doctor tier. Generali offered to price higher doctor limits.', href:links.generali, label:'Generali'}]},
-    {id:'gen-classic', insurer:'Generali', name:'Classic', short:'Generali Classic', cover:'Doctors + private room after accidents', monthly:72.68, accident:12.36, kind:'accident', source:GENERALI_SOURCE,
-      tagline:'Doctor cover, plus a private room if you have an accident.',
-      doctor:{limit:1805}, hospital:'accident',
-      features:{doctor:'€1,805 a year', hospital:'Private twin room after accidents; €54 a day in cash for illness', medicines:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
-      covers:['Private twin room after an accident, with no excess to pay','€54 a day paid to you when you’re in hospital for an illness','Private doctors, scans and lab tests: up to €1,805 a year'],
-      gaps:['Illness, e.g. a planned operation, is not private: you get the cash, not the room','Medicines, physio and psychotherapy: €415 a year each','Non-contract hospitals pay only fixed tariff amounts'],
-      next:[{text:'Ask Generali for a quote and the list of contract hospitals.', href:links.generali, label:'Generali'}]},
-    {id:'gen-premium', insurer:'Generali', name:'Premium', short:'Generali Premium', cover:'Doctors + private hospital', monthly:164.86, accident:12.36, kind:'hospital', source:GENERALI_SOURCE,
-      tagline:'Private hospital for illness and accidents, plus doctor cover.',
-      doctor:{limit:1805}, hospital:'full',
-      features:{doctor:'€1,805 a year', hospital:'Private twin room for illness and accidents, anywhere in Austria', medicines:'€415 a year', therapy:'€415 physio, €415 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
-      covers:['Private twin room and your choice of doctor, for illness and accidents','Contract-hospital bills paid in full, doctors’ fees included. No euro limit.','You pay at most €1,500 a year in Vienna (€300 a day, 5 days). Lower Austria and Burgenland: €0.'],
-      gaps:['No guaranteed surgery date','Medicines, physio and psychotherapy: €415 a year each','Non-contract hospitals pay only fixed tariff amounts'],
-      next:[{text:'Ask Generali for a quote, and ask for the version with no excess. They offered both.', href:links.generali, label:'Generali'},
-        {text:'Check that the hospitals and surgeons you would use are Generali contract partners.'}]},
-    {id:'gen-premium-plus', insurer:'Generali', name:'Premium + bigger doctor limit', short:'Generali Premium+', cover:'Higher doctor limit + private hospital', monthly:199.12, accident:12.36, kind:'hospital', estimate:true,
-      source:'Estimate · Premium + the 2AJ doctor tier',
-      tagline:'Private hospital plus a high doctor limit.',
-      doctor:{limit:3705, over:.25}, hospital:'full',
-      features:{doctor:'€3,705 a year, then 25% of fees', hospital:'Private twin room for illness and accidents, anywhere in Austria', medicines:'€685 a year', therapy:'€685 physio, €685 psychotherapy', travel:'Trips up to 6 weeks, up to €250,000'},
-      covers:['Everything in Premium','Private doctors, scans and lab tests: up to €3,705 a year, then 25%','Higher medicine, physio and psychotherapy limits: €685 each'],
-      gaps:['Estimated price: the 2AJ doctor tier costs +€34.26 a month in a quote for a 43-year-old','No guaranteed surgery date','Medicines still capped at €685 a year'],
-      next:[{text:'Ask Generali to quote Premium with the higher “2AJ” doctor tier.', href:links.generali, label:'Generali'},
-        {text:'Check that the hospitals and surgeons you would use are Generali contract partners.'}]},
-    {id:'ws-classic', insurer:'Wiener Städtische', name:'Private doctor Classic', short:'Wiener Städtische Classic', cover:'Doctors only', monthly:128.07, kind:'doctor', source:'Online calculator · Oct 2026 · age 40',
-      tagline:'Higher doctor limit, no hospital cover.',
-      doctor:{limit:3200}, hospital:null,
-      features:{doctor:'€3,200 a year', hospital:null, medicines:'€519 a year', therapy:'€613 a year', travel:null},
-      covers:['Private doctors and scans: up to €3,200 a year','Separate allowances for therapy (€613) and medicines (€519)','Price from the online calculator: easy to check yourself'],
-      gaps:['No hospital cover at all','Dental is excluded','Medicines capped at €519 a year'],
-      next:[{text:'Get your own price in the Wiener Städtische online calculator.', href:links.wiener, label:'Wiener Städtische calculator'}]},
-    {id:'ws-premium', insurer:'Wiener Städtische', name:'Private doctor Premium', short:'Wiener Städtische Premium', cover:'Doctors only', monthly:185.49, kind:'doctor', source:'Online calculator · Oct 2026 · age 40',
-      tagline:'The highest doctor limit here, no hospital cover.',
-      doctor:{limit:6400}, hospital:null,
-      features:{doctor:'€6,400 a year', hospital:null, medicines:'€1,038 a year', therapy:'€1,226 a year', travel:null},
-      covers:['Private doctors and scans: up to €6,400 a year','Separate allowances for therapy (€1,226) and medicines (€1,038)','Price from the online calculator: easy to check yourself'],
-      gaps:['No hospital cover at all','Dental is excluded','Medicines capped at €1,038 a year'],
-      next:[{text:'Get your own price in the Wiener Städtische online calculator.', href:links.wiener, label:'Wiener Städtische calculator'}]},
-    {id:'cigna', insurer:'Cigna Global', name:'Platinum + International Outpatient', monthly:761, kind:'international', benchmark:true,
-      source:'Rough benchmark · published example abroad',
-      tagline:'Worldwide cover with very high limits.',
-      doctor:{limit:Infinity}, hospital:'world',
-      features:{doctor:'No yearly maximum (excess and co-pay apply)', hospital:'Private hospital, worldwide', medicines:'Broad prescription cover; confirm your drug', therapy:'Covered with limits', travel:'Worldwide'},
-      covers:['Hospital, specialists, scans and prescribed medicines, worldwide','No overall yearly maximum on outpatient care','One of the few options for very expensive medicines'],
-      gaps:['Price is a benchmark from another country, not an Austrian quote','Expat eligibility rules apply; excess and co-pays on top','Experimental treatment is excluded'],
-      next:[{text:'Ask Cigna for an Austrian quote: eligibility, excess, maximum yearly co-pay, and written cover for any specific medicine.', href:links.cigna, label:'Cigna Global'}]},
-    {id:'allianz', insurer:'Allianz Care', name:'Signature + outpatient', monthly:null, from:254, kind:'international', benchmark:true,
-      source:'Core plan only · published UK example',
-      tagline:'International cover; outpatient module costs extra.',
-      doctor:{limit:Infinity}, hospital:'world',
-      features:{doctor:'Up to 60 visits a year, combined', hospital:'Private hospital, international', medicines:'Outpatient drugs, no stated cap', therapy:'Within the 60 visits', travel:'International'},
-      covers:['Broad hospital cover','Outpatient prescribed drugs without a stated limit','Excess you choose yourself'],
-      gaps:['Full price unknown: €254–300 a month is the core plan only','Expat eligibility rules apply','Experimental treatment is excluded'],
-      next:[{text:'Ask Allianz Care for an Austrian quote including the outpatient module, and written cover for any specific medicine.', href:links.allianz, label:'Allianz Care'}]}
+    {id:'oegk', short:'No private insurance', insurer:'ÖGK only', cover:'€0 premiums · you pay it all', monthly:0,
+      source:{type:'none', label:'Paid via salary'}, out:null, hosp:{},
+      meter:{doctors:0, hospital:0, meds:0, therapy:1, travel:1, move:0},
+      cells:{doctors:'You pay it all', hospital:'Public ward', meds:'ÖGK-listed drugs only', therapy:'Some, with a referral', travel:'EHIC card in the EU', move:'Ends: join the new country’s system'},
+      facts:['🏥 Public hospitals cover necessary treatment','🧑‍⚕️ Doctors with an ÖGK contract are free','🆓 Free yearly check-up'],
+      link:{href:links.checkup, label:'ÖGK health check'}},
+    {id:'gen-basic', short:'Generali Basic', insurer:'Generali', cover:'Doctors + hospital cash', monthly:65.38, accident:12.36,
+      source:QUOTE, out:AJ1, hosp:{cash:50},
+      meter:{doctors:2, hospital:1, meds:1, therapy:1, travel:3, move:1},
+      cells:{doctors:'€1,805 a year', hospital:'€50 a day, cash', meds:'€415 a year', therapy:'€415 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      facts:['🧑‍⚕️ Doctors & tests: up to €1,805 a year','💵 €50 a day in hospital, paid to you','✈️ Travel cover for trips up to 6 weeks'],
+      link:{href:links.generali, label:'Get a quote'}},
+    {id:'gen-basic-plus', short:'Generali Basic+', insurer:'Generali', cover:'Big doctor limit + hospital cash', monthly:99.64, accident:12.36,
+      source:ESTIMATE, out:AJ2, hosp:{cash:50},
+      meter:{doctors:3, hospital:1, meds:2, therapy:2, travel:3, move:1},
+      cells:{doctors:'€3,705, then 25%', hospital:'€50 a day, cash', meds:'€685 a year', therapy:'€685 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      facts:['🧑‍⚕️ Doctors & tests: up to €3,705 a year, then 25%','💵 €50 a day in hospital, paid to you','🔮 Estimated: Basic + the 2AJ doctor tier'],
+      link:{href:links.generali, label:'Ask for this quote'}},
+    {id:'gen-classic', short:'Generali Classic', insurer:'Generali', cover:'Doctors + private room after accidents', monthly:72.68, accident:12.36,
+      source:QUOTE, out:AJ1, hosp:{cash:54, accidentPrivate:true, accidentCash:160},
+      meter:{doctors:2, hospital:2, meds:1, therapy:1, travel:3, move:1},
+      cells:{doctors:'€1,805 a year', hospital:'Private after accidents, €54/day illness', meds:'€415 a year', therapy:'€415 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      facts:['🚑 Private room after an accident, €0 excess','💵 €54 a day for illness stays','🧑‍⚕️ Doctors & tests: up to €1,805 a year'],
+      link:{href:links.generali, label:'Get a quote'}},
+    {id:'gen-premium', short:'Generali Premium', insurer:'Generali', cover:'Doctors + private hospital', monthly:164.86, accident:12.36,
+      source:QUOTE, out:AJ1, hosp:PREMIUM_HOSPITAL,
+      meter:{doctors:2, hospital:4, meds:1, therapy:1, travel:3, move:1},
+      cells:{doctors:'€1,805 a year', hospital:'Private room, max €1,500/yr excess', meds:'€415 a year', therapy:'€415 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      facts:['🏥 Private room for illness & accidents','🧾 You pay at most €1,500 a year (Vienna)','🧑‍⚕️ Doctors & tests: up to €1,805 a year'],
+      link:{href:links.generali, label:'Get a quote'}},
+    {id:'gen-premium-plus', short:'Generali Premium+', insurer:'Generali', cover:'Big doctor limit + private hospital', monthly:199.12, accident:12.36,
+      source:ESTIMATE, out:AJ2, hosp:PREMIUM_HOSPITAL,
+      meter:{doctors:3, hospital:4, meds:2, therapy:2, travel:3, move:1},
+      cells:{doctors:'€3,705, then 25%', hospital:'Private room, max €1,500/yr excess', meds:'€685 a year', therapy:'€685 a year', travel:'Trips up to 6 weeks', move:'Austria only, once you live abroad'},
+      facts:['🏥 Private room for illness & accidents','🧑‍⚕️ Doctors & tests: up to €3,705 a year, then 25%','🔮 Estimated: Premium + the 2AJ doctor tier'],
+      link:{href:links.generali, label:'Ask for this quote'}},
+    {id:'ws-classic', short:'Wiener Städtische Classic', insurer:'Wiener Städtische', cover:'Doctors only', monthly:128.07,
+      source:CALC, out:{doc:3200, therapy:613, meds:519}, hosp:{},
+      meter:{doctors:3, hospital:0, meds:1, therapy:2, travel:0, move:1},
+      cells:{doctors:'€3,200 a year', hospital:'Not included', meds:'€519 a year', therapy:'€613 a year', travel:'Not included', move:'Austrian plan: check the terms'},
+      facts:['🧑‍⚕️ Doctors & tests: up to €3,200 a year','💆 Separate therapy allowance: €613','🚫 No hospital cover'],
+      link:{href:links.wiener, label:'Calculate your price'}},
+    {id:'ws-premium', short:'Wiener Städtische Premium', insurer:'Wiener Städtische', cover:'Doctors only', monthly:185.49,
+      source:CALC, out:{doc:6400, therapy:1226, meds:1038}, hosp:{},
+      meter:{doctors:4, hospital:0, meds:2, therapy:3, travel:0, move:1},
+      cells:{doctors:'€6,400 a year', hospital:'Not included', meds:'€1,038 a year', therapy:'€1,226 a year', travel:'Not included', move:'Austrian plan: check the terms'},
+      facts:['🧑‍⚕️ Doctors & tests: up to €6,400 a year','💆 Therapy €1,226, medicines €1,038','🚫 No hospital cover'],
+      link:{href:links.wiener, label:'Calculate your price'}},
+    {id:'cigna', short:'Cigna Global Platinum', insurer:'Cigna Global', cover:'Worldwide, with outpatient', monthly:761, benchmark:true,
+      source:BENCH, out:{all:true}, hosp:{private:true},
+      meter:{doctors:5, hospital:5, meds:5, therapy:4, travel:5, move:5},
+      cells:{doctors:'No yearly maximum', hospital:'Private, worldwide', meds:'Broad cover', therapy:'Covered', travel:'Worldwide', move:'Moves with you'},
+      facts:['🌍 Worldwide, very high limits','💊 Broad cover for expensive medicines','❓ Excess and co-pays not included'],
+      link:{href:links.cigna, label:'Ask for a quote'}},
+    {id:'allianz', short:'Allianz Care Signature', insurer:'Allianz Care', cover:'International, + outpatient module', monthly:254, priceFloor:true, benchmark:true,
+      source:BENCH, out:{all:true}, hosp:{private:true},
+      meter:{doctors:4, hospital:5, meds:5, therapy:3, travel:5, move:5},
+      cells:{doctors:'60 visits a year', hospital:'Private, international', meds:'No stated cap', therapy:'Inside the 60 visits', travel:'International', move:'Moves with you'},
+      facts:['🌍 International hospital cover','💊 Outpatient drugs with no stated cap','❓ Core price only: outpatient module costs extra'],
+      link:{href:links.allianz, label:'Ask for a quote'}}
   ];
   const byId = id => plans.find(p => p.id === id);
-  const budgets = {b50:50, b100:100, b200:200, any:Infinity};
 
-  // What the plan pays back on a year of private doctor bills (cautious 80% rule).
-  function doctorPaid(plan, bill) {
-    const d = plan.doctor;
-    bill = clamp(bill, 0, 1e6);
-    if (!d || d.limit === Infinity) return 0;
-    let paid = Math.min(.8 * bill, d.limit);
-    if (d.over && .8 * bill > d.limit) paid += d.over * (bill - d.limit / .8);
+  // Turn level choices into a year of bills.
+  function usageFrom(levels = {}, room = 'private', cause = 'illness') {
+    const pick = c => c.levels[Math.max(0, Math.min(4, Number(levels[c.key]) || 0))];
+    const u = {privateRoom: room !== 'public', accident: cause === 'accident'};
+    for (const c of care) {
+      const l = pick(c);
+      if (c.key === 'hospital') { u.hospitalBill = l[0]; u.hospitalDays = l[3]; }
+      else u[c.key] = l[0];
+    }
+    return u;
+  }
+  const bills = u => round(u.visits + u.tests + u.therapy + u.meds + (u.privateRoom ? u.hospitalBill : 0));
+
+  // What the plan pays back on outpatient bills.
+  function outpatientPaid(plan, u) {
+    const o = plan.out;
+    const bill = u.visits + u.tests + u.therapy + u.meds;
+    if (!o) return 0;
+    if (o.all) return bill;
+    const docBill = u.visits + u.tests;
+    let doc = Math.min(.8 * docBill, o.doc);
+    const other = Math.min(.8 * u.therapy, o.therapy) + Math.min(.8 * u.meds, o.meds);
+    let paid;
+    if (o.total) { doc = Math.min(doc, o.total); paid = doc + Math.min(other, o.total - doc); }
+    else paid = doc + other;
+    if (o.over && docBill > doc / .8) paid += o.over * (docBill - doc / .8);
     return round(Math.min(paid, bill));
   }
-  // Premiums plus the part of the doctor bills you still pay.
-  function yearCost(plan, bill) {
-    bill = clamp(bill, 0, 1e6);
-    const premium = round(plan.monthly * 12), paid = doctorPaid(plan, bill), youPay = round(bill - paid);
-    return {premium, paid, youPay, total: round(premium + youPay)};
+  // What a hospital stay costs you, and any daily cash the plan pays you.
+  function hospitalCost(plan, u) {
+    const d = u.hospitalDays || 0, h = plan.hosp || {};
+    if (!d) return {pay:0, cash:0};
+    let pay = 0, cash = 0;
+    if (u.privateRoom) {
+      pay = u.hospitalBill;
+      if (h.private) pay = u.accident || !h.excess ? 0 : h.excess * Math.min(d, h.excessDays);
+      else if (h.accidentPrivate && u.accident) pay = 0;
+      else if (h.cash) cash = h.cash * d;
+    } else if (h.publicCash) cash = h.publicCash * d;
+    else if (h.accidentCash && u.accident) cash = h.accidentCash * d;
+    else if (h.cash) cash = h.cash * d;
+    return {pay, cash};
   }
-  // Yearly doctor bills at which the premiums are paid back. Null when never.
+  // A year on this plan: premiums plus what you still pay, minus cash paid to you.
+  function yearCost(plan, u) {
+    const premium = round(plan.monthly * 12);
+    const outBill = u.visits + u.tests + u.therapy + u.meds;
+    const outPaid = outpatientPaid(plan, u);
+    const h = hospitalCost(plan, u);
+    const youPay = round(outBill - outPaid + h.pay);
+    return {plan, premium, youPay, cash:round(h.cash), total:round(premium + youPay - h.cash),
+      unknown:!!plan.benchmark};
+  }
+  // Every plan, cheapest first. The winner must have a real or estimated Austrian price.
+  function rank(u) {
+    const rows = plans.map(p => yearCost(p, u)).sort((a, b) => a.total - b.total || a.plan.monthly - b.plan.monthly);
+    const winner = rows.find(r => !r.unknown);
+    const none = rows.find(r => r.plan.id === 'oegk');
+    return {rows, winner, none, bills:bills(u), saving:round(none.total - winner.total)};
+  }
+  // Doctor and test bills at which a plan's premiums are paid back.
   function breakEven(plan) {
-    if (!plan.doctor || plan.doctor.limit === Infinity || !plan.monthly) return null;
+    const o = plan.out;
+    if (!o || o.all || !plan.monthly) return null;
     const premium = plan.monthly * 12;
-    if (premium > plan.doctor.limit) return null;
-    return Math.ceil(premium / .8);
-  }
-  function rank(ids, bill, budget) {
-    return ids.map(byId).filter(p => p.monthly <= budget)
-      .map(p => ({plan:p, ...yearCost(p, bill)}))
-      .sort((a, b) => a.total - b.total || a.plan.monthly - b.plan.monthly);
+    return premium > o.doc ? null : Math.ceil(premium / .8);
   }
 
-  const doctorPool = ['oegk', 'gen-basic', 'gen-basic-plus', 'ws-classic', 'ws-premium'];
-  function match(input) {
-    const a = {goal:'', spend:1000, budget:'any', condition:'no', ...input};
-    if (!['hospital','doctor','both','big','unsure'].includes(a.goal)) return null;
-    const bill = clamp(a.spend, 0, 1e6);
-    const budget = budgets[a.budget] ?? Infinity;
-    const self = yearCost(byId('oegk'), bill);
-    let primary, fit = 'match', headline, why, alternatives = [], notes = [];
-    const cheapestDoctor = byId('gen-basic');
-
-    if (a.goal === 'doctor' || a.goal === 'unsure') {
-      const ranked = rank(doctorPool, bill, budget);
-      primary = ranked[0].plan;
-      alternatives = ranked.slice(1, 3).map(r => r.plan);
-      if (primary.id === 'oegk') {
-        headline = 'Skip doctor insurance for now';
-        why = budget < cheapestDoctor.monthly
-          ? `Nothing fits under ${money(budget)} a month. The cheapest doctor cover here is Generali Basic at ${money(cheapestDoctor.monthly, true)}.`
-          : `At about ${money(bill)} a year of private doctor bills, insurance costs more than it pays back. It starts paying off at around ${money(breakEven(cheapestDoctor))} a year.`;
-        if (!alternatives.length) alternatives = [cheapestDoctor];
-      } else {
-        const r = ranked[0];
-        headline = `${primary.insurer} ${primary.name}`;
-        why = `At about ${money(bill)} a year of private doctor bills, this pays back about ${money(r.paid)} for ${money(r.premium)} in premiums. That’s the lowest yearly total among the plans in your budget.`;
-      }
-      if (a.goal === 'unsure') alternatives = [...alternatives.slice(0, 1), byId('gen-premium')];
-    } else if (a.goal === 'hospital' || a.goal === 'both' || a.goal === 'big') {
-      const ranked = rank(a.goal === 'both' ? ['gen-premium', 'gen-premium-plus'] : ['gen-premium'], bill, budget);
-      if (ranked.length) {
-        primary = ranked[0].plan;
-        headline = `${primary.insurer} ${primary.name}`;
-        why = a.goal === 'big'
-          ? 'ÖGK already pays for necessary treatment in public hospitals. If you want a serious illness treated privately, Premium pays contract-hospital bills in full with no euro limit (Generali confirmed this in writing). Your share in Vienna is at most €1,500 a year.'
-          : 'It’s the only plan here with a private twin room for illness as well as accidents. Contract-hospital bills are paid in full, doctors’ fees included.';
-        if (primary.id === 'gen-premium-plus') why += ` With about ${money(bill)} a year of doctor bills, the bigger doctor limit pays for itself.`;
-        alternatives = ranked.slice(1).map(r => r.plan);
-        if (a.goal !== 'big') alternatives.push(byId('gen-classic'));
-      } else if (a.goal === 'big') {
-        primary = byId('oegk'); fit = 'none';
-        headline = 'Public cover already pays big hospital bills';
-        why = 'ÖGK pays for necessary treatment in public hospitals, however expensive it gets. Private hospital cover (Generali Premium, €164.86 a month) buys comfort and choice. It isn’t what stops a huge bill.';
-        alternatives = [byId('gen-premium')];
-      } else if (budget >= byId('gen-classic').monthly) {
-        primary = byId('gen-classic'); fit = 'partial';
-        headline = 'Generali Classic';
-        why = `Full private hospital cover (Generali Premium, ${money(164.86, true)} a month) is above your budget. Classic gets you a private room after accidents, cash for illness stays, and doctor cover.`;
-        alternatives = [byId('gen-premium')];
-      } else {
-        primary = byId('oegk'); fit = 'none';
-        headline = 'Stay with public cover for now';
-        why = 'Private hospital cover starts at €72.68 a month (accidents only) and €164.86 a month (illness too). Public hospitals already cover necessary treatment.';
-        alternatives = [byId('gen-classic'), byId('gen-premium')];
-      }
-      if (a.goal === 'big') {
-        alternatives = [...alternatives.filter(p => p.kind !== 'accident'), byId('cigna'), byId('allianz')];
-        notes.push({tone:'warn', title:'Very expensive medicines are the real gap',
-          text:'Austrian plans cap prescription medicines at €415–€1,038 a year. Generali confirmed the cap applies even to a €100,000 drug that ÖGK won’t pay. Only international plans offer broad drug cover, and only for eligible expats. Ask ÖGK about approval first.'});
-      }
-    }
-    if (a.condition !== 'no') notes.unshift({tone:'warn', title:'About your health condition',
-      text:'Tell the insurer everything before you sign. Treatment that started before the contract is never covered. A condition you declare in writing is covered unless they exclude it in writing. You’ll only see your exclusions and final price after their health check.'});
-    const year = {self: self.total, plan: yearCost(primary, bill)};
-    const next = [...primary.next];
-    if (a.condition !== 'no' && primary.id !== 'oegk') next.unshift({text:'Disclose your condition and get the insurer’s answer in writing before you rely on the policy.'});
-    if (primary.id !== 'oegk') next.push({text:'Don’t cancel any existing cover until the new policy is issued.'});
-    return {answers:a, primary, fit, headline, why, alternatives:alternatives.filter((p, i, l) => p && p.id !== primary.id && l.indexOf(p) === i).slice(0, 3),
-      notes, year, next, saving: round(year.self - year.plan.total)};
-  }
-
-  const api = {plans, byId, budgets, doctorPaid, yearCost, breakEven, match, money, links};
+  const api = {care, presets, plans, byId, portable, usageFrom, bills, outpatientPaid, hospitalCost, yearCost, rank, breakEven, money, links};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.InsuranceDecision = api;
 })(typeof window !== 'undefined' ? window : globalThis);

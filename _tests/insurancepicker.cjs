@@ -2,92 +2,90 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const M=require('../insurancepicker/decision-model.js');
 const plan=id=>M.byId(id);
-const base={goal:'doctor',spend:1000,budget:'any',condition:'no'};
+const year=(levels,room,cause)=>M.usageFrom({visits:0,tests:0,therapy:0,meds:0,hospital:0,...levels},room,cause);
+const cost=(id,u)=>M.yearCost(plan(id),u);
 
 test('Generali prices are the quoted health parts for the 40-year-old adult',()=>{
   assert.equal(plan('gen-basic').monthly,65.38);
   assert.equal(plan('gen-classic').monthly,72.68);
   assert.equal(plan('gen-premium').monthly,164.86);
-  // The full Premium quote, including optional accident insurance, stays €177.22.
-  assert.equal(round(plan('gen-premium').monthly+plan('gen-premium').accident),177.22);
-  assert.ok(plan('gen-basic-plus').estimate && plan('gen-premium-plus').estimate);
+  assert.equal(Math.round((plan('gen-premium').monthly+plan('gen-premium').accident)*100)/100,177.22);
 });
-function round(n){return Math.round(n*100)/100;}
-
-test('Doctor refunds use 80% up to each yearly limit',()=>{
-  assert.equal(M.doctorPaid(plan('gen-basic'),1000),800);
-  assert.equal(M.doctorPaid(plan('gen-basic'),5000),1805);
-  assert.equal(M.doctorPaid(plan('ws-premium'),5000),4000);
-  assert.equal(M.yearCost(plan('ws-premium'),5000).total,3225.88);
-  assert.equal(M.doctorPaid(plan('oegk'),5000),0);
-});
-test('The higher Generali tier pays 25% of fees beyond its limit',()=>{
-  const p=plan('gen-basic-plus');
-  assert.equal(M.doctorPaid(p,4000),3200);
-  assert.equal(M.doctorPaid(p,8000),4547.19);
-});
-test('Break-even bills are honest, and Premium never pays off on doctor bills alone',()=>{
-  assert.equal(M.breakEven(plan('gen-basic')),981);
-  assert.equal(M.breakEven(plan('ws-classic')),1922);
-  assert.equal(M.breakEven(plan('ws-premium')),2783);
-  assert.equal(M.breakEven(plan('gen-premium')),null);
-});
-test('Low doctor spending recommends keeping ÖGK and paying as you go',()=>{
-  const r=M.match({...base,spend:300});
-  assert.equal(r.primary.id,'oegk');assert.match(r.why,/€981/);
-  assert.equal(r.alternatives[0].id,'gen-basic');
-});
-test('Doctor spending picks the cheapest yearly total within budget',()=>{
-  assert.equal(M.match({...base,spend:1500}).primary.id,'gen-basic');
-  assert.equal(M.match({...base,spend:3000,budget:'b100'}).primary.id,'gen-basic-plus');
-  assert.equal(M.match({...base,spend:8000}).primary.id,'ws-premium');
-  assert.equal(M.match({...base,spend:8000,budget:'b100'}).primary.id,'gen-basic-plus');
-  assert.equal(M.match({...base,spend:3000,budget:'b50'}).primary.id,'oegk');
-});
-test('A recommended doctor plan never costs more than paying yourself',()=>{
-  for(const spend of [0,500,1000,1500,2500,4000,6000,8000]) for(const budget of Object.keys(M.budgets)){
-    const r=M.match({...base,spend,budget});
-    assert.ok(r.saving>=0,`${spend} ${budget}`);
+test('No private insurance is always ranked: €0 premiums, every bill out of pocket',()=>{
+  for(const p of M.presets) for(const room of ['private','public']){
+    const u=M.usageFrom(p.levels,room,'illness'), r=M.rank(u);
+    assert.equal(r.rows.length,M.plans.length);
+    assert.equal(r.none.premium,0);
+    assert.equal(r.none.total,M.bills(u));
   }
 });
-test('Hospital wishes get Premium, or an honest fallback on smaller budgets',()=>{
-  const h={...base,goal:'hospital'};
-  assert.equal(M.match(h).primary.id,'gen-premium');
-  const mid=M.match({...h,budget:'b100'});
-  assert.equal(mid.primary.id,'gen-classic');assert.equal(mid.fit,'partial');
-  assert.ok(mid.primary.gaps.some(g=>/not private/.test(g)));
-  const low=M.match({...h,budget:'b50'});
-  assert.equal(low.primary.id,'oegk');assert.equal(low.fit,'none');
+test('Every kind of care has five levels, and presets use them',()=>{
+  for(const c of M.care) assert.equal(c.levels.length,5);
+  for(const p of M.presets) for(const c of M.care) assert.ok(p.levels[c.key]>=0&&p.levels[c.key]<=4);
 });
-test('Both hospital and doctors: the bigger doctor tier wins only with high bills',()=>{
-  assert.equal(M.match({...base,goal:'both',spend:1000}).primary.id,'gen-premium');
-  assert.equal(M.match({...base,goal:'both',spend:4000}).primary.id,'gen-premium-plus');
+test('Outpatient bills: 80% back within each limit, and Generali’s shared total',()=>{
+  const u=year({visits:4});
+  assert.equal(M.outpatientPaid(plan('gen-basic'),u),1805);
+  assert.equal(M.outpatientPaid(plan('ws-premium'),u),2400);
+  // Generali's €1,805 is shared by doctors, therapy and medicines.
+  assert.equal(M.outpatientPaid(plan('gen-basic'),year({visits:4,therapy:4,meds:3})),1805);
+  // Wiener's therapy and medicine allowances sit on top of the doctor limit.
+  assert.equal(M.outpatientPaid(plan('ws-classic'),year({visits:4,therapy:4,meds:3})),2400+613+519);
 });
-test('Huge-bill worries flag the medicine gap and point to international plans',()=>{
-  const r=M.match({...base,goal:'big'});
-  assert.equal(r.primary.id,'gen-premium');
-  assert.ok(r.notes.some(n=>/medicines/.test(n.title)));
-  assert.deepEqual(r.alternatives.map(p=>p.id).slice(-2),['cigna','allianz']);
-  const cheap=M.match({...base,goal:'big',budget:'b100'});
-  assert.equal(cheap.primary.id,'oegk');
-  assert.ok(!cheap.alternatives.some(p=>p.id==='gen-classic'));
+test('The bigger Generali doctor tier pays 25% beyond its limit',()=>{
+  const u=year({visits:4,tests:4});
+  assert.equal(M.outpatientPaid(plan('gen-basic-plus'),u),Math.round((3705+.25*(5500-3705/.8))*100)/100);
 });
-test('A known or unsure condition always adds the disclosure warning',()=>{
-  for(const goal of ['hospital','doctor','both','big','unsure']) for(const condition of ['yes','unsure']){
-    const r=M.match({...base,goal,condition});
-    assert.match(r.notes[0].text,/declare it in writing|declare in writing/);
+test('A €100k medicine leaves almost the whole bill with Austrian plans',()=>{
+  const u=year({meds:4});
+  assert.equal(cost('gen-premium',u).youPay,100000-415);
+  assert.equal(cost('ws-premium',u).youPay,100000-1038);
+  assert.equal(cost('cigna',u).youPay,0);assert.ok(cost('cigna',u).unknown);
+});
+test('Private hospital: Premium caps the Vienna excess at five days',()=>{
+  const u=year({hospital:4},'private','illness');
+  assert.equal(cost('gen-premium',u).youPay,1500);
+  assert.equal(cost('oegk',u).youPay,100000);
+  assert.equal(cost('gen-premium',year({hospital:1})).youPay,300);
+  assert.equal(cost('gen-premium',year({hospital:4},'private','accident')).youPay,0);
+});
+test('Classic: private after accidents, daily cash for illness',()=>{
+  const ill=cost('gen-classic',year({hospital:2},'private','illness'));
+  assert.equal(ill.youPay,15000);assert.equal(ill.cash,162);
+  assert.equal(cost('gen-classic',year({hospital:2},'private','accident')).youPay,0);
+  assert.equal(cost('gen-classic',year({hospital:2},'public','accident')).cash,480);
+});
+test('Public ward: ÖGK pays, and some plans pay cash per day',()=>{
+  const u=year({hospital:2},'public');
+  assert.equal(M.bills(u),0);
+  assert.equal(cost('oegk',u).total,0);
+  assert.equal(cost('gen-basic',u).cash,150);
+  assert.equal(cost('gen-premium',u).cash,390);
+  assert.equal(cost('ws-classic',u).cash,0);
+});
+test('The winner always has an Austrian price; benchmarks only get a note',()=>{
+  for(const p of M.presets) for(const room of ['private','public']){
+    const r=M.rank(M.usageFrom(p.levels,room,'illness'));
+    assert.ok(!r.winner.unknown);
+    assert.equal(r.saving,Math.round((r.none.total-r.winner.total)*100)/100);
   }
-  assert.equal(M.match(base).notes.length,0);
 });
-test('Unsure users get a spending answer plus the hospital option',()=>{
-  const r=M.match({...base,goal:'unsure',spend:300});
-  assert.equal(r.primary.id,'oegk');
-  assert.ok(r.alternatives.some(p=>p.id==='gen-premium'));
+test('Typical years pick sensible winners',()=>{
+  const pick=id=>M.rank(M.usageFrom(M.presets.find(p=>p.id===id).levels,'private','illness')).winner.plan.id;
+  assert.equal(pick('healthy'),'oegk');
+  assert.equal(pick('normal'),'oegk');
+  assert.equal(pick('busy'),'gen-basic');
+  assert.equal(pick('rough'),'gen-premium-plus');
 });
-test('Benchmarks and estimates are labelled, never presented as quotes',()=>{
+test('Only the international plans move with you',()=>{
+  for(const p of M.plans) assert.equal(M.portable(p),p.id==='cigna'||p.id==='allianz');
+  for(const p of M.plans) assert.ok(p.cells.move&&p.meter.move>=0);
+});
+test('Estimates and benchmarks are labelled',()=>{
   for(const p of M.plans){
-    if(p.benchmark) assert.match(p.source,/benchmark|example/i);
-    if(p.estimate) assert.match(p.source,/Estimate/);
+    if(p.benchmark) assert.equal(p.source.type,'bench');
+    if(p.id.endsWith('-plus')) assert.equal(p.source.type,'estimate');
   }
-  assert.equal(M.match({goal:'nonsense'}),null);
+  assert.equal(M.breakEven(plan('gen-basic')),981);
+  assert.equal(M.breakEven(plan('gen-premium')),null);
 });

@@ -12,159 +12,95 @@ permalink: /insurancepicker/
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
 <title>Vienna Insurance Picker · mati.bot</title>
-<meta name="description" content="Find out whether private health insurance is worth it for you in Vienna, which plan fits, and what it really costs. Real 2026 quotes, plain English.">
+<meta name="description" content="Pick how much care you might need this year and see every Vienna health insurance plan ranked by what it really costs you.">
 <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e1311" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/img/favicon.ico">
-<link rel="stylesheet" href="/insurancepicker/picker.css?v=4">
-<script src="/insurancepicker/decision-model.js?v=4" defer></script>
-<script src="/insurancepicker/picker.js?v=4" defer></script>
+<link rel="stylesheet" href="/insurancepicker/picker.css?v=5">
+<script src="/insurancepicker/decision-model.js?v=5" defer></script>
+<script src="/insurancepicker/picker.js?v=5" defer></script>
 </head>
 <body>
-<a href="#picker" class="skip">Skip to the questions</a>
+<a href="#picker" class="skip">Skip to the planner</a>
 <header class="nav"><div class="wrap nav-in">
   <a class="brand" href="/">mati.bot</a><span class="nav-product">Insurance picker · Vienna</span>
-  <nav class="nav-links" aria-label="Sections"><a href="#full-comparison">Compare</a><a href="#hospital">Hospital</a><a href="#faq">FAQ</a></nav>
+  <nav class="nav-links" aria-label="Sections"><a href="#picker">Your year</a><a href="#plans">Plans</a><a href="#faq">FAQ</a></nav>
 </div></header>
 
 <main>
 <section class="hero wrap">
-  <p class="pill">Vienna · prices checked October 2026</p>
-  <h1>Find the private health insurance that fits you.</h1>
-  <p class="lede">Four quick questions. Find out whether private cover is worth it for you, which plan fits, and what it really costs.</p>
-  <ul class="trust"><li>Real 2026 quotes</li><li>No sign-up</li><li>Answers stay on your device</li></ul>
+  <p class="pill"><span class="e" aria-hidden="true">🇦🇹</span> Vienna · prices checked October 2026</p>
+  <h1>Which health insurance wins your year?</h1>
+  <p class="lede">Tap how much care you might need. Every plan re-ranks by what it really costs you, including no insurance at all.</p>
 </section>
 
-<section id="picker" class="wrap picker-wrap" aria-label="Find your plan">
-  <span class="anchor" id="guide"></span>
-  <div class="quiz" id="quiz"><noscript><p><strong>The questions need JavaScript.</strong> Everything else on this page works without it: see the plans, the hospital guide and the FAQ below.</p></noscript></div>
-</section>
-
-<section id="basics" class="section wrap" aria-labelledby="h-basics">
-  <div class="section-head"><p class="eyebrow">The basics</p><h2 id="h-basics">How private cover works in Austria</h2>
-  <p>If you work in Vienna you’re already insured with ÖGK. Private insurance is an extra on top of that, so you can see private doctors and get a private room in hospital.</p></div>
-  <div class="basics">
-    <article class="card basic have"><span class="q-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 7.7-8 9-4.6-1.3-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
-      <h3>You already have ÖGK</h3><p>Doctors with an ÖGK contract, emergencies, necessary operations in public hospitals and most prescriptions. Paid through your salary.</p><p class="from">€0 <span>extra</span></p></article>
-    <article class="card basic"><span class="q-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v2a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="10" r="2"/></svg></span>
-      <h3>Private doctor cover</h3><p>See any private doctor (Wahlarzt). Send the bill to ÖGK, then to your insurer. They pay back 80–100%, up to a yearly limit.</p><p class="from">from €65 <span>/ month</span></p></article>
-    <article class="card basic"><span class="q-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20V9l9-5 9 5v11"/><path d="M9 20v-5h6v5"/><path d="M12 8v4M10 10h4"/></svg></span>
-      <h3>Private hospital cover</h3><p>“Sonderklasse”: a twin room, your choice of doctor, private hospitals. The hospital bills the insurer directly; you pay a capped excess.</p><p class="from">from €165 <span>/ month, incl. doctor cover</span></p></article>
-    <article class="card basic"><span class="q-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></span>
-      <h3>International plans</h3><p>Worldwide cover with very high limits, including expensive medicines. Mostly for expats, so check you’re eligible.</p><p class="from">€250–760+ <span>/ month</span></p></article>
+<section id="picker" class="wrap" aria-label="Plan your year">
+  <span class="anchor" id="full-comparison"></span><span class="anchor" id="guide"></span>
+  <div class="planner">
+    <div class="card panel" id="controls"><noscript><p>The planner needs JavaScript. The plan chart below works without it.</p></noscript></div>
+    <div class="card results" id="results"></div>
   </div>
-  <dl class="card glossary" aria-label="Words you’ll hear">
-    <div><dt>Kassenarzt</dt><dd>Doctor with an ÖGK contract. Free for you.</dd></div>
-    <div><dt>Wahlarzt</dt><dd>Private doctor. You pay; ÖGK refunds a small part.</dd></div>
-    <div><dt>Sonderklasse</dt><dd>Private class in hospital: better room, your choice of doctor.</dd></div>
-    <div><dt>Selbstbehalt</dt><dd>Your excess: the part of a covered bill you pay yourself.</dd></div>
-    <div><dt>Vertragskrankenhaus</dt><dd>Contract hospital. It bills your insurer directly.</dd></div>
-    <div><dt>Kostenübernahme</dt><dd>Written cost approval from the insurer before treatment.</dd></div>
-  </dl>
 </section>
 
-<section id="full-comparison" class="section wrap" aria-labelledby="h-compare">
-  <span class="anchor" id="premiums"></span><span class="anchor" id="scenarios"></span><span class="anchor" id="coverage"></span>
-  <div class="section-head"><p class="eyebrow">Compare</p><h2 id="h-compare">Every plan, side by side</h2>
-  <p>Move the slider to your yearly private doctor bills. We add up premiums and the bills you’d still pay, so you see what a year really costs.</p></div>
-  <div id="compare" hidden>
-    <div class="card controls">
-      <div class="ctl-spend"><label for="cmp-spend"><span>Your private doctor bills per year</span><output id="cmp-spend-out" for="cmp-spend">€1,000</output></label>
-        <input class="range" type="range" id="cmp-spend" min="0" max="8000" step="100" value="1000"></div>
-      <div class="ctl-filter"><p id="filter-label">Show plans for</p><div class="chips" id="cmp-filter" role="group" aria-labelledby="filter-label">
-        <button type="button" class="chip" data-filter="all" aria-pressed="true">Everything</button>
-        <button type="button" class="chip" data-filter="doctor" aria-pressed="false">Doctors</button>
-        <button type="button" class="chip" data-filter="hospital" aria-pressed="false">Hospital</button>
-        <button type="button" class="chip" data-filter="international" aria-pressed="false">International</button></div></div>
-    </div>
-    <div class="card chart">
-      <div class="chart-head"><h3>What a year costs you at <span class="cmp-bill">€1,000</span> of bills</h3>
-        <p class="legend"><span><i class="k-prem"></i>Premiums</span><span><i class="k-pay"></i>Bills you still pay</span></p></div>
-      <div class="chart-rows" id="chart-rows"></div>
-      <p class="chart-note">Per adult, doctor bills only. Hospital cover isn’t counted as savings here: its value is the private room and choice of doctor if you need it. International plans aren’t shown because their Austrian prices and co-pays are unknown.</p>
-    </div>
-    <div class="plans" id="plans"></div>
-  </div>
-  <noscript><p>Turn on JavaScript to compare plans interactively. In short: Generali Basic €65.38, Classic €72.68 and Premium €164.86 a month (real quotes, age 40); Wiener Städtische private doctor Classic €128.07 and Premium €185.49 (online calculator, age 40).</p></noscript>
+<section id="plans" class="section wrap" aria-labelledby="h-plans">
+  <span class="anchor" id="coverage"></span><span class="anchor" id="premiums"></span>
+  <div class="section-head"><p class="eyebrow">Every plan at a glance</p><h2 id="h-plans">More emojis, more cover</h2>
+  <p>Five is the most. ❌ means not included.</p></div>
+  <div class="card matrix-wrap"><table class="matrix">
+    <thead><tr><th scope="col">Plan</th><th scope="col"><span class="e" aria-hidden="true">💶</span>Per month</th><th scope="col"><span class="e" aria-hidden="true">🧑‍⚕️</span>Doctors &amp; tests</th><th scope="col"><span class="e" aria-hidden="true">🏥</span>Hospital</th><th scope="col"><span class="e" aria-hidden="true">💊</span>Medicines</th><th scope="col"><span class="e" aria-hidden="true">💆</span>Therapy</th><th scope="col"><span class="e" aria-hidden="true">✈️</span>Travel</th><th scope="col"><span class="e" aria-hidden="true">🧳</span>Move abroad</th></tr></thead>
+    <tbody id="matrix-body">
+      <tr><th scope="row">No private insurance</th><td>€0</td><td colspan="6">You pay private care yourself; ÖGK covers public care.</td></tr>
+      <tr><th scope="row">Generali Basic</th><td>€65.38</td><td colspan="6">Doctors €1,805 a year, €50 a day hospital cash.</td></tr>
+      <tr><th scope="row">Generali Classic</th><td>€72.68</td><td colspan="6">Doctors €1,805 a year, private room after accidents.</td></tr>
+      <tr><th scope="row">Generali Premium</th><td>€164.86</td><td colspan="6">Doctors €1,805 a year, private hospital, max €1,500 a year excess.</td></tr>
+      <tr><th scope="row">Wiener Städtische Classic / Premium</th><td>€128.07 / €185.49</td><td colspan="6">Doctors €3,200 / €6,400 a year, no hospital.</td></tr>
+      <tr><th scope="row">Cigna Global / Allianz Care</th><td>≈ €761 / from €254</td><td colspan="6">International, moves with you. Rough benchmarks.</td></tr>
+    </tbody></table></div>
+  <p class="matrix-legend"><span>✅ Real quote (age 40)</span><span>🔮 Estimate</span><span>🧮 Online calculator (age 40)</span><span>❓ Rough benchmark</span><span>Per adult, per month</span></p>
 </section>
 
-<section id="hospital" class="section wrap" aria-labelledby="h-hospital">
-  <div class="section-head"><p class="eyebrow">If you end up in hospital</p><h2 id="h-hospital">What you get, and what you pay</h2>
-  <p>A necessary operation is covered by ÖGK either way. Private cover changes the room, the doctor and the hospital you can choose.</p></div>
-  <div class="hosp">
-    <article class="card"><h3>ÖGK only</h3><p class="who">No private plan</p>
-      <p class="room">General ward in a public hospital. The doctor on duty treats you. Planned operations can mean a waiting list.</p>
-      <div class="pay"><small>You pay</small><strong>A small daily fee</strong><p>For up to 28 days a year.</p></div></article>
-    <article class="card"><h3>Generali Basic</h3><p class="who">€65.38 / month</p>
-      <p class="room">Same public care as ÖGK. Generali pays you cash for every day you’re in hospital.</p>
-      <div class="pay"><small>You get</small><strong>€50 a day</strong><p>Paid to you. A day-clinic stay counts as one day.</p></div></article>
-    <article class="card"><h3>Generali Classic</h3><p class="who">€72.68 / month</p>
-      <p class="room"><strong>After an accident:</strong> private twin room in a contract hospital. <strong>Illness:</strong> general ward, plus cash.</p>
-      <div class="pay"><small>You pay</small><strong>€0 after accidents</strong><p>Illness stays: €54 a day paid to you.</p></div></article>
-    <article class="card top"><h3>Generali Premium</h3><p class="who">€164.86 / month</p>
-      <p class="room">Private twin room and your choice of doctor, for illness and accidents, anywhere in Austria. Contract hospitals bill Generali directly.</p>
-      <div class="pay"><small>You pay at most</small><strong>€1,500 a year</strong><p>In Vienna: €300 a day for up to 5 days a year. €0 in Lower Austria and Burgenland, and €0 after accidents. Single room in Vienna: €371 a day.</p></div></article>
+<section id="facts" class="section wrap" aria-labelledby="h-facts">
+  <div class="section-head"><p class="eyebrow">Good to know</p><h2 id="h-facts">Four things worth knowing</h2></div>
+  <div class="facts">
+    <article class="card fact"><span class="big e" aria-hidden="true">🏥</span><strong>€1M hospital bill? You pay €1,500.</strong><p>Generali Premium, Vienna contract hospital. Generali confirmed it in writing.</p></article>
+    <article class="card fact"><span class="big e" aria-hidden="true">💀</span><strong>€100k medicine? Mostly on you.</strong><p>Austrian plans pay €415–€1,038 a year. Only international plans go further.</p></article>
+    <article class="card fact"><span class="big e" aria-hidden="true">🩺</span><strong>Doctor cover pays off from ~€981</strong><p>a year of private doctor and test bills (Generali Basic).</p></article>
+    <article class="card fact"><span class="big e" aria-hidden="true">🧳</span><strong>Moving away? Austrian plans stay.</strong><p>Once you live abroad they cover Austria only. International plans move with you.</p></article>
   </div>
-  <div class="card callout"><span class="q-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 7.7-8 9-4.6-1.3-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
-    <p><strong>A €1 million hospital bill? Your share stays at €1,500.</strong>We asked Generali in writing. For covered treatment in an Austrian contract hospital, Premium pays the agreed costs in full, doctors’ fees included. There’s no yearly, lifetime or per-illness euro limit. Non-contract hospitals are different: there Generali pays only fixed tariff amounts.</p></div>
 </section>
 
 <section id="faq" class="section wrap" aria-labelledby="h-faq">
   <span class="anchor" id="edge-cases"></span>
-  <div class="section-head"><p class="eyebrow">Good to know</p><h2 id="h-faq">Questions people ask</h2></div>
+  <div class="section-head"><p class="eyebrow">FAQ</p><h2 id="h-faq">Quick answers</h2></div>
   <div class="faq">
-    <details><summary>Do I actually need private insurance in Vienna?</summary><div class="a">
-      <p>No. ÖGK covers doctors with a contract, emergencies, necessary operations in public hospitals and most prescriptions. Private insurance buys <strong>comfort, choice and sometimes speed</strong>: private doctors, a better hospital room and your pick of surgeon.</p>
-      <p>If you rarely see private doctors and don’t mind a public ward, keeping ÖGK and paying as you go is usually cheapest.</p></div></details>
-    <details><summary>How does paying a private doctor (Wahlarzt) work?</summary><div class="a">
-      <p>You pay the doctor, then send the bill to ÖGK. ÖGK refunds 80% of what it would have paid a contract doctor, which is usually a small part of a private fee.</p>
-      <p>Then you send the bill and ÖGK’s statement to your private insurer. Generali pays <strong>100% of what’s left</strong> if ÖGK paid something, or <strong>80%</strong> if ÖGK paid nothing, up to the yearly limit. Our numbers use 80% to stay on the safe side.</p></div></details>
-    <details><summary>Does private hospital cover get me surgery faster?</summary><div class="a">
-      <p>It can help, because private hospitals and private-class beds often have more flexible scheduling. But <strong>no insurer guarantees a date</strong>. Ask the surgeon and hospital for real dates before you rely on it.</p></div></details>
-    <details><summary>What’s the most I could pay for a big operation?</summary><div class="a">
-      <p>With Generali Premium in a Vienna contract hospital: <strong>€300 a day for at most 5 days a year, so €1,500</strong>. Generali confirmed there’s no euro limit on what they pay there. A few things can push your share higher:</p>
-      <p>A stay over New Year falls into two calendar years, so you can hit the €1,500 twice. A single room costs €371 a day in Vienna. At a non-contract hospital, Generali pays only fixed tariff amounts, so check the hospital first.</p></div></details>
-    <details><summary>What about very expensive medicines?</summary><div class="a">
-      <p>This is the biggest gap. Austrian plans cap prescription medicines at <strong>€415 a year</strong> (Generali), €685 (Generali’s higher doctor tier) or €519–€1,038 (Wiener Städtische). Generali confirmed the cap applies even to a €100,000 drug that ÖGK won’t pay.</p>
-      <p>Talk to ÖGK first: it has its own approval routes for expensive drugs. International plans like Cigna and Allianz Care cover prescriptions much more broadly, but you need to be eligible and should get written confirmation for your specific drug.</p></div></details>
-    <details><summary>I have a health condition. Can I still get covered?</summary><div class="a">
-      <p>Usually yes, but read this carefully. According to Generali: treatment that <strong>started before the contract</strong> is never covered. A condition that existed before but needs treatment later <strong>is covered if you declared it in writing</strong> and Generali didn’t exclude it in writing.</p>
-      <p>You must answer the health questions honestly. Your final price and any exclusions are only set after the insurer has seen your answers.</p></div></details>
-    <details><summary>Am I covered abroad?</summary><div class="a">
-      <p>Generali’s Premium covers public hospitals elsewhere in Europe (your excess may apply). Outside Europe, only if the treatment can’t be done as well in Austria, a doctor recommends it, and Generali approves it in advance.</p>
-      <p>On trips up to 6 weeks, all three Generali plans include travel cover up to €250,000 for sudden illness or accidents.</p></div></details>
-    <details><summary>Are experimental or off-label treatments covered?</summary><div class="a">
-      <p>Experimental treatments aren’t covered by Generali, Cigna or Allianz Care. Off-label use needs a case-by-case decision. A high limit or a hospital stay doesn’t change that, so ask for a written answer first.</p></div></details>
-    <details><summary>Will my premium go up?</summary><div class="a">
-      <p>Expect it to. Over the last five years Generali’s tariffs rose on average <strong>3.74% a year</strong> (hospital), <strong>6.08%</strong> (doctor cover), 7.14% (higher doctor tier), 5.70% (hospital cash) and 1.24% (accident-only hospital). The 5% partner discount ends after year three.</p>
-      <p>Switching insurer later usually means a new health check, and new conditions may then be excluded.</p></div></details>
-    <details><summary>What if I stay healthy and never claim?</summary><div class="a">
-      <p>You keep paying premiums; that’s how insurance works. Generali’s doctor cover can refund 15% of its premium after a claim-free year (about €82). It’s conditional, so we leave it out of the numbers.</p></div></details>
-    <details><summary>What about couples and children?</summary><div class="a">
-      <p>Prices here are per adult. Generali gives couples 5% off for the first three years, already included in the prices shown. Each person is priced by age, so a partner’s price will differ a little. Children need their own quote.</p></div></details>
-    <details><summary>Where do these prices come from?</summary><div class="a">
-      <p><strong>Generali:</strong> real written quotes of 23 September 2026 for a 40-year-old office worker insured with ÖGK in Vienna, and Generali’s written answers of 8 October 2026. <strong>Wiener Städtische:</strong> their online calculator, age 40, Vienna, 15 October 2026. <strong>Cigna and Allianz Care:</strong> published examples from other countries, so treat them as rough benchmarks only.</p>
-      <p>Your price depends on your age and health, and is only final after the insurer’s health check.</p></div></details>
+    <details><summary>Do I need private insurance at all?</summary><p>No. ÖGK covers contract doctors, emergencies, necessary operations in public hospitals and most prescriptions. Private cover buys comfort, choice and sometimes speed.</p></details>
+    <details><summary>How do private doctor bills get paid back?</summary><p>Send the bill to ÖGK first; it refunds a small part. Then send it to your insurer. Generali pays 100% of the rest if ÖGK paid something, 80% if not. We use 80% to be safe.</p></details>
+    <details><summary>What if we move out of Austria?</summary><p>Generali covers treatment abroad only while Austria is your home (more than 6 months a year). After you move, it covers Austria only, and you can cancel at the end of the month you move. Ask about a standby policy (Anwartschaft) if you might come back. ÖGK ends and you join your new country’s system. Cigna and Allianz Care are built to move with you; the price can change.</p></details>
+    <details><summary>What about existing health conditions?</summary><p>Declare everything. Treatment that started before the contract is never covered. A condition you declared is covered unless the insurer excludes it in writing.</p></details>
+    <details><summary>Does private cover get me surgery faster?</summary><p>It can help, but no insurer guarantees a date. Ask the surgeon for real dates first.</p></details>
+    <details><summary>Will my premium go up?</summary><p>Probably. Generali’s tariffs rose 1–7% a year on average over the last five years, and the 5% partner discount ends after year three.</p></details>
+    <details><summary>Where do the prices come from?</summary><p>Generali: real quotes (23 Sep 2026) for a 40-year-old in Vienna and written answers (8 Oct 2026). Wiener Städtische: online calculator, age 40. Cigna and Allianz Care: published examples from other countries. Your price depends on your age and health.</p></details>
   </div>
 </section>
 
 <section id="checklist" class="section wrap" aria-labelledby="h-check">
-  <span class="anchor" id="decision"></span>
-  <div class="section-head"><p class="eyebrow">Before you sign</p><h2 id="h-check">Six things to check</h2></div>
-  <ol class="checklist">
-    <li class="card"><strong>Tell them everything</strong><p>Answer the health questions fully. Leaving something out can cost you a claim later.</p></li>
-    <li class="card"><strong>Get the final offer in writing</strong><p>The quote is an estimate until the insurer has reviewed your health. Check the price and any exclusions.</p></li>
-    <li class="card"><strong>Check your hospitals</strong><p>Make sure the hospitals and surgeons you’d use are contract partners. Others pay only tariff amounts.</p></li>
-    <li class="card"><strong>Ask about price rises</strong><p>Ask what you’ll pay after discounts end, and when you can first cancel. At Generali that’s the end of year three.</p></li>
-    <li class="card"><strong>Get cost approval first</strong><p>Before a planned treatment, ask for a written cost approval (Kostenübernahme). It’s required for direct billing.</p></li>
-    <li class="card"><strong>Don’t cancel too early</strong><p>Keep any existing cover until the new policy is actually issued.</p></li>
-  </ol>
+  <div class="section-head"><p class="eyebrow">Before you sign</p><h2 id="h-check">Six quick checks</h2></div>
+  <ul class="checks">
+    <li class="card"><span class="e" aria-hidden="true">✍️</span><span><strong>Declare every condition</strong><span>Leaving one out can cost you a claim.</span></span></li>
+    <li class="card"><span class="e" aria-hidden="true">📄</span><span><strong>Get the final offer in writing</strong><span>Price and exclusions come after the health check.</span></span></li>
+    <li class="card"><span class="e" aria-hidden="true">🏨</span><span><strong>Check your hospitals</strong><span>Contract hospitals bill the insurer directly.</span></span></li>
+    <li class="card"><span class="e" aria-hidden="true">📈</span><span><strong>Ask about price rises</strong><span>And when you can first cancel (Generali: year 3).</span></span></li>
+    <li class="card"><span class="e" aria-hidden="true">🧾</span><span><strong>Get cost approval first</strong><span>Before any planned treatment.</span></span></li>
+    <li class="card"><span class="e" aria-hidden="true">⏳</span><span><strong>Don’t cancel too early</strong><span>Keep old cover until the new policy is issued.</span></span></li>
+  </ul>
 </section>
 </main>
 
+<a class="dock" id="dock" href="#ranking" aria-label="See the ranking"></a>
+
 <footer class="footer"><div class="wrap footer-in">
-  <div><p><strong>mati.bot insurance picker</strong></p><p>An independent guide, not affiliated with any insurer. It isn’t financial advice: always check the final offer and the policy terms.</p><p>Prices checked 15 October 2026.</p></div>
-  <div><p><strong>Sources</strong></p><p>Generali quotes (23 Sep 2026) and written answers (8 Oct 2026). <a href="https://www.wienerstaedtische.at/versicherungen/privatkunden/gesund-fit/online-abschluss-krankenversicherung.html" rel="noreferrer">Wiener Städtische calculator</a> and <a href="https://www.wienerstaedtische.at/fileadmin/user_upload/Dokumente/Folder/Gesundheit/Folder_MEDplus_Privatarzt.pdf" rel="noreferrer">benefit schedule</a>. <a href="https://cogotec.com/blog/what-does-international-health-insurance-cost" rel="noreferrer">Cigna price example</a>, <a href="https://www.cignaglobal.com/individuals-families/international-health-insurance/global-professionals/optional-benefits" rel="noreferrer">Cigna outpatient benefits</a>. <a href="https://www.expatica.com/global/healthcare/healthcare-basics/allianz-care-health-insurance-review-2173537/" rel="noreferrer">Allianz Care prices</a>, <a href="https://health.allianzcare-publications.com/story/care-tob-en/page/2" rel="noreferrer">benefit table</a>. ÖGK on <a href="https://www.oegk.at/cdscontent/?contentid=10007.870543" rel="noreferrer">hospital care</a>, <a href="https://www.sozialversicherung.gv.at/cdscontent/?contentid=10007.881097" rel="noreferrer">medicines</a> and the <a href="https://www.gesundheitskasse.at/cdscontent/?contentid=10007.882097" rel="noreferrer">free health check</a>.</p></div>
+  <div><p><strong>mati.bot insurance picker</strong></p><p>Independent, not affiliated with any insurer. Not financial advice: check the final offer and policy terms. Prices checked 15 October 2026.</p></div>
+  <div><p><strong>Sources</strong></p><p>Generali quotes (23 Sep 2026), written answers (8 Oct 2026) and general terms (AVBKV 2017). <a href="https://www.wienerstaedtische.at/versicherungen/privatkunden/gesund-fit/online-abschluss-krankenversicherung.html" rel="noreferrer">Wiener Städtische calculator</a> and <a href="https://www.wienerstaedtische.at/fileadmin/user_upload/Dokumente/Folder/Gesundheit/Folder_MEDplus_Privatarzt.pdf" rel="noreferrer">benefits</a>. <a href="https://cogotec.com/blog/what-does-international-health-insurance-cost" rel="noreferrer">Cigna price example</a> and <a href="https://www.cignaglobal.com/individuals-families/international-health-insurance/global-professionals/optional-benefits" rel="noreferrer">benefits</a>. <a href="https://www.expatica.com/global/healthcare/healthcare-basics/allianz-care-health-insurance-review-2173537/" rel="noreferrer">Allianz Care prices</a> and <a href="https://health.allianzcare-publications.com/story/care-tob-en/page/2" rel="noreferrer">benefits</a>. ÖGK on <a href="https://www.oegk.at/cdscontent/?contentid=10007.870543" rel="noreferrer">hospitals</a>, <a href="https://www.sozialversicherung.gv.at/cdscontent/?contentid=10007.881097" rel="noreferrer">medicines</a> and the <a href="https://www.gesundheitskasse.at/cdscontent/?contentid=10007.882097" rel="noreferrer">free check-up</a>.</p></div>
 </div></footer>
 </body>
 </html>
