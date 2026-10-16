@@ -208,7 +208,7 @@
     {key:'baby', emoji:'🤰', label:'Pregnancy', icon:'👶'}, {key:'travel', emoji:'✈️', label:'Travel', icon:'✈️'},
     {key:'israel', emoji:'🇮🇱', label:'Israel', icon:'🛡️'}, {key:'usa', emoji:'🇺🇸', label:'USA', icon:'🛡️'},
     {key:'move', emoji:'🧳', label:'Move abroad', icon:'🧳'}];
-  const srcIcon = {quote:'✅', estimate:'🔮', calc:'🧮', bench:'❓', none:'🏛️'};
+  const srcIcon = {quote:'✅', estimate:'🔮', calc:'🧮', list:'📋', bench:'❓', none:'🏛️'};
   const meter = (n, ic) => n < 0 ? `<span class="meter zero" aria-label="Not stated">❔</span>`
     : n ? `<span class="meter" aria-label="${n} of 5">${ic.repeat(n)}<i>${ic.repeat(5 - n)}</i></span>` : `<span class="meter zero" aria-label="None">❌</span>`;
   function sorted() {

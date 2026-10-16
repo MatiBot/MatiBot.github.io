@@ -3,6 +3,8 @@
  * with ÖGK in Vienna, including a 5% partner discount for the first three years,
  * and Generali's written answers of 8 Oct 2026.
  * Wiener Städtische: online calculator, age 40, Vienna, ÖGK, checked 15 Oct 2026.
+ * PassportCard: official "Global Zone 3" price list (Nov 2024), matching a real quote of Feb 2025;
+ * includes the €10 rider that removes the €200 yearly deductible.
  * Cigna and Allianz Care: published examples from other countries; benchmarks only.
  * Outpatient bills: 80% back (the cautious case), within each plan's limits.
  * Hospital bills are examples of a private bill, not price estimates.
@@ -17,7 +19,8 @@
     wiener: 'https://www.wienerstaedtische.at/versicherungen/privatkunden/gesund-fit/online-abschluss-krankenversicherung.html',
     cigna: 'https://www.cignaglobal.com/',
     allianz: 'https://www.allianzcare.com/',
-    checkup: 'https://www.gesundheitskasse.at/cdscontent/?contentid=10007.882097'
+    checkup: 'https://www.gesundheitskasse.at/cdscontent/?contentid=10007.882097',
+    passportcard: 'https://www.passportcard.co.il/health-insurance/'
   };
 
   // Five levels per kind of care: [amount in €, emoji, label]. Hospital adds days.
@@ -48,6 +51,7 @@
   const ESTIMATE = {type:'estimate', label:'Estimate'};
   const CALC = {type:'calc', label:'Online calculator'};
   const BENCH = {type:'bench', label:'Rough benchmark'};
+  const LIST = {type:'list', label:'Price list · age 40–44'};
   // meter: 0–5 per feature for the emoji chart; -1 means the insurer doesn't say.
   // move: what happens if you leave Austria. baby: pregnancy and birth.
   const portable = p => p.meter.move >= 5;
@@ -100,6 +104,12 @@
       cells:{doctors:'€6,400 a year', hospital:'Not included', meds:'€1,038 a year', therapy:'€1,226 physio, €1,038 psychotherapy', travel:'Not stated in their brochure', move:'Austrian plan: check the terms', baby:'Midwife costs + private check-ups', israel:'Not stated in their brochure', usa:'Not stated in their brochure'},
       facts:['🧑‍⚕️ Doctors & tests: up to €6,400 a year','💆 Therapy €1,226, medicines €1,038','🚫 No hospital cover'],
       link:{href:links.wiener, label:'Calculate your price'}},
+    {id:'passportcard', short:'PassportCard Global', insurer:'PassportCard', cover:'All of Europe, no deductible', monthly:480,
+      source:LIST, out:{doc:3800000, therapy:912, meds:3800000, rate:1, therapyRate:38 / 70}, hosp:{private:true},
+      meter:{doctors:5, hospital:5, meds:5, therapy:2, travel:3, move:4, baby:4, israel:4, usa:2},
+      cells:{doctors:'No separate limit (€3.8M overall)', hospital:'Private hospitals, no excess', meds:'No separate limit (€3.8M overall)', therapy:'Physio €38 a visit, 24 a year; mental health €8,000 a year', travel:'Emergencies outside Europe', move:'Moves with you within Europe', baby:'€25,000 per policy · 12-month wait', israel:'Covered via Clalit (its co-pays)', usa:'Emergencies only'},
+      facts:['💳 Doctors, tests and medicines paid with no deductible','🏥 €3.8M overall limit, private hospitals','🇮🇱 Built for Israelis abroad; covers visits to Israel'],
+      link:{href:links.passportcard, label:'Ask for a quote'}},
     {id:'cigna', short:'Cigna Global Platinum', insurer:'Cigna Global', cover:'Worldwide, with outpatient', monthly:761, benchmark:true,
       source:BENCH, out:{all:true}, hosp:{private:true},
       meter:{doctors:5, hospital:5, meds:5, therapy:4, travel:5, move:5, baby:4, israel:5, usa:2},
@@ -137,7 +147,8 @@
     const o = plan.out, docBill = u.visits + u.tests;
     if (!o) return {doc:0, therapy:0, meds:0};
     if (o.all) return {doc:docBill, therapy:u.therapy, meds:u.meds};
-    let doc = Math.min(.8 * docBill, o.doc), therapy = Math.min(.8 * u.therapy, o.therapy), meds = Math.min(.8 * u.meds, o.meds);
+    const rate = o.rate || .8, therapyRate = o.therapyRate || .8;
+    let doc = Math.min(rate * docBill, o.doc), therapy = Math.min(therapyRate * u.therapy, o.therapy), meds = Math.min(rate * u.meds, o.meds);
     if (o.total) {
       // Generali's limits share one yearly total; doctors are paid first.
       doc = Math.min(doc, o.total);

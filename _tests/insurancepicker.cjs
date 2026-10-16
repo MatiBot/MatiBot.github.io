@@ -118,3 +118,13 @@ test('Every plan says something about pregnancy, Israel and the USA',()=>{
     assert.ok(p.meter[k]>=-1&&p.meter[k]<=5);
   }
 });
+test('PassportCard: real price list, no deductible, medicines without a separate cap',()=>{
+  const p=plan('passportcard');
+  assert.equal(p.monthly,480);assert.ok(!p.benchmark);assert.equal(p.source.type,'list');
+  const worst=M.usageFrom(M.presets.find(x=>x.id==='worst').levels,'private','illness');
+  const c=M.yearCost(p,worst);
+  // Everything is paid except physio beyond 24 visits at €38 each.
+  assert.equal(c.parts.meds,0);assert.equal(c.parts.doctors,0);assert.equal(c.parts.hospital,0);
+  assert.equal(c.parts.therapy,2800-912);
+  assert.equal(M.rank(worst).winner.plan.id,'passportcard');
+});
